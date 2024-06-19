@@ -1,8 +1,29 @@
 import { useForm } from "react-hook-form";
 import FormField from "./FormField";
-import { FormData, UserSchema, ValidFieldNames } from "@/types";
+import { FormData, UserSchema, ValidFieldNames } from "../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+
+const muscleGroups = [
+  { key: 1, value: "Calves" },
+  { key: 2, value: "Quads" },
+  { key: 3, value: "Hamstrings" },
+  { key: 4, value: "Glutes" },
+  { key: 5, value: "Hip flexors" },
+  { key: 6, value: "Abdominals" },
+  { key: 7, value: "Obliques" },
+  { key: 8, value: "Lower back" },
+  { key: 9, value: "Lats" },
+  { key: 10, value: "Traps" },
+  { key: 11, value: "Chest" },
+  { key: 12, value: "Rear delts" },
+  { key: 13, value: "Lateral delts" },
+  { key: 14, value: "Front delts" },
+  { key: 15, value: "Biceps" },
+  { key: 16, value: "Triceps" },
+  { key: 17, value: "Forearms" },
+  { key: 18, value: "Cardiovascular system" },
+];
 
 function Form() {
   const {
@@ -21,11 +42,11 @@ function Form() {
 
       // Define a mapping between server-side field names and their corresponding client-side names
       const fieldErrorMapping: Record<string, ValidFieldNames> = {
-        email: "email",
-        githubUrl: "githubUrl",
-        yearsOfExperience: "yearsOfExperience",
-        password: "password",
-        confirmPassword: "confirmPassword",
+        exerciseName: "exerciseName",
+        exerciseDescription: "exerciseDescription",
+        isTimeBased: "isTimeBased",
+        primaryMuscleGroupId: "primaryMuscleGroupId",
+        secondaryMuscleGroupId: "secondaryMuscleGroupId",
       };
 
       // Find the first field with an error in the response data
@@ -49,47 +70,65 @@ function Form() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="grid col-auto">
-        <h1 className="text-3xl font-bold mb-4">React-Hook-Form & Zod</h1>
-        <FormField
-          type="email"
-          placeholder="Email"
-          name="email"
-          register={register}
-          error={errors.email}
-        />
-
+        <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
         <FormField
           type="text"
-          placeholder="GitHub URL"
-          name="githubUrl"
+          placeholder="exercise name"
+          name="exerciseName"
           register={register}
-          error={errors.githubUrl}
+          error={errors.exerciseName}
         />
 
         <FormField
-          type="number"
-          placeholder="Years of Experience (1 - 10)"
-          name="yearsOfExperience"
+          type="textarea"
+          placeholder="description (optional)"
+          name="exerciseDescription"
           register={register}
-          error={errors.yearsOfExperience}
+          error={errors.exerciseDescription}
+        />
+
+        <FormField
+          type="boolean"
+          label="Is this a time based exercise?"
+          name="isTimeBased"
+          register={register}
+          error={errors.isTimeBased}
           valueAsNumber
         />
 
         <FormField
-          type="password"
-          placeholder="Password"
-          name="password"
+          type="select"
+          name="primaryMuscleGroupId"
+          label="Primary Muscle Group"
           register={register}
-          error={errors.password}
-        />
+          error={errors.primaryMuscleGroupId}
+          required
+          valueAsNumber
+        >
+          <option value="">Select a muscle group</option>
+          {muscleGroups.map(({ key, value }) => (
+            <option key={key} value={key}>
+              {value}
+            </option>
+          ))}
+        </FormField>
 
         <FormField
-          type="password"
-          placeholder="Confirm Password"
-          name="confirmPassword"
+          type="select"
+          name="secondaryMuscleGroupId"
+          label="Secondary Muscle Group"
           register={register}
-          error={errors.confirmPassword}
-        />
+          error={errors.secondaryMuscleGroupId}
+          valueAsNumber
+        >
+          <option value="">Select a muscle group</option>
+          {muscleGroups.map(({ key, value }) => (
+            <option key={key} value={key}>
+              {value}
+            </option>
+          ))}
+        </FormField>
+
         <button type="submit" className="submit-button">
           Submit
         </button>
