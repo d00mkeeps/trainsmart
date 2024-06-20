@@ -10,11 +10,13 @@ export type FormData = {
 };
 
 export const UserSchema: ZodType<FormData> = z.object({
-  exerciseName: z.string(),
+  exerciseName: z.string().min(1, "Required"),
   exerciseDescription: z.string().optional(),
   isTimeBased: z.boolean(),
-  primaryMuscleGroupId: z.number(),
-  secondaryMuscleGroupId: z.number(),
+  primaryMuscleGroupId: z.number().refine((val) => val !== 222, {
+    message: "Please choose a primary muscle group",
+  }),
+  secondaryMuscleGroupId: z.number().optional(),
 });
 
 export type FormFieldProps = {
@@ -25,11 +27,11 @@ export type FormFieldProps = {
   error: FieldError | undefined;
   valueAsNumber?: boolean;
   label?: string;
-  required?: boolean;
   defaultValue?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   validationOptions?: RegisterOptions;
   children?: React.ReactNode;
+  required?: boolean;
 };
 
 export type ValidFieldNames =

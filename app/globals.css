@@ -32,7 +32,7 @@ select {
 }
 input::placeholder,
 select::placeholder {
-color: black;
+  color: black;
 }
 
 .submit-button {
@@ -41,7 +41,21 @@ color: black;
   padding: 10px;
   margin-top: 10px;
   font-weight: bold;
-  color: rgb(var(--foreground-rgb)) ;
+  color: rgb(var(--foreground-rgb));
+}
+
+.form-element {
+  background-color: rgba(0, 26, 255, 0.217);
+  border: 1px solid rgb(21, 0, 255);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px;
+  outline: none;
+  color: black;
+  appearance: none;
+}
+.form-element::placeholder {
+  color: black;
 }
 
 .submit-button:hover {
@@ -52,4 +66,10 @@ color: black;
   color: rgb(238, 80, 80);
   font-size: 10px;
   margin-left: 10px;
+}
+
+textarea {
+  @apply form-element;
+  resize: vertical;
+  min-height: 100px;
 }

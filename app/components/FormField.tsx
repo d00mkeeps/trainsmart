@@ -19,7 +19,10 @@ const FormField: React.FC<FormFieldProps> = ({
           <input
             type={type}
             placeholder={placeholder}
-            {...register(name, { valueAsNumber })}
+            {...register(name, {
+              required: required && "This field is required",
+              valueAsNumber,
+            })}
           />
         );
       case "textarea":

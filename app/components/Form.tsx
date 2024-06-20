@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
 const muscleGroups = [
+  { key: 222, value: "muscle groups" },
   { key: 1, value: "Calves" },
   { key: 2, value: "Quads" },
   { key: 3, value: "Hamstrings" },
@@ -37,6 +38,14 @@ function Form() {
 
   const onSubmit = async (data: FormData) => {
     try {
+      const newData = {
+        ...data,
+        secondaryMuscleGroupId:
+          data.secondaryMuscleGroupId === 222
+            ? null
+            : data.secondaryMuscleGroupId,
+      };
+      console.log(newData);
       const response = await axios.post("/api/form", data); // Make a POST request
       const { errors = {} } = response.data; // Destructure the 'errors' property from the response data
 
@@ -71,12 +80,14 @@ function Form() {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="grid col-auto">
         <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
+
         <FormField
           type="text"
           placeholder="exercise name"
           name="exerciseName"
           register={register}
           error={errors.exerciseName}
+          required={true}
         />
 
         <FormField
@@ -102,10 +113,9 @@ function Form() {
           label="Primary Muscle Group"
           register={register}
           error={errors.primaryMuscleGroupId}
-          required
           valueAsNumber
+          required={true}
         >
-          <option value="">Select a muscle group</option>
           {muscleGroups.map(({ key, value }) => (
             <option key={key} value={key}>
               {value}
@@ -121,7 +131,6 @@ function Form() {
           error={errors.secondaryMuscleGroupId}
           valueAsNumber
         >
-          <option value="">Select a muscle group</option>
           {muscleGroups.map(({ key, value }) => (
             <option key={key} value={key}>
               {value}
