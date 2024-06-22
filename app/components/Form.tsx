@@ -1,11 +1,18 @@
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FormField from "./FormField";
-import { FormData, UserSchema, ValidFieldNames } from "../../types";
+import { FormData, UserSchema, UserProfile, NewExercise } from "../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import fetchUserProfiles, {
+  insertExercise,
+} from "./userprofile/supabaseFunctions";
+import { createClient } from "@supabase/supabase-js";
 
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const supabase = createClient(url, key);
 const muscleGroups = [
-  { key: 222, value: "muscle groups" },
+  { key: 222, value: "Choose..." },
   { key: 1, value: "Calves" },
   { key: 2, value: "Quads" },
   { key: 3, value: "Hamstrings" },
@@ -27,6 +34,7 @@ const muscleGroups = [
 ];
 
 function Form() {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {
     register,
     handleSubmit,
@@ -35,43 +43,55 @@ function Form() {
   } = useForm<FormData>({
     resolver: zodResolver(UserSchema), // Apply the zodResolver
   });
-
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const userProfile = await fetchUserProfiles();
+        setUserProfile(userProfile);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    }
+    loadUserProfile();
+  }, []);
   const onSubmit = async (data: FormData) => {
+    if (!userProfile) {
+      console.error("user profile not loaded");
+      return;
+    }
+
     try {
       const newData = {
-        ...data,
-        secondaryMuscleGroupId:
+        name: data.exerciseName,
+        description: data.exerciseDescription,
+        is_time_based: data.isTimeBased,
+        primary_muscle_group_id: data.primaryMuscleGroupId,
+        secondary_muscle_group_id:
           data.secondaryMuscleGroupId === 222
             ? null
             : data.secondaryMuscleGroupId,
-      };
-      console.log(newData);
-      const response = await axios.post("/api/form", data); // Make a POST request
-      const { errors = {} } = response.data; // Destructure the 'errors' property from the response data
+        user_id: userProfile.user_id,
+        is_template: false,
+      } as NewExercise;
+      console.log("new data:", newData);
 
-      // Define a mapping between server-side field names and their corresponding client-side names
-      const fieldErrorMapping: Record<string, ValidFieldNames> = {
-        exerciseName: "exerciseName",
-        exerciseDescription: "exerciseDescription",
-        isTimeBased: "isTimeBased",
-        primaryMuscleGroupId: "primaryMuscleGroupId",
-        secondaryMuscleGroupId: "secondaryMuscleGroupId",
-      };
+      const result = await insertExercise(supabase, newData);
+      if (result.success) {
+        console.log("Exercise inserted successfully:", result);
+      } else {
+        console.log("Failed to insert exercise:", result.error);
 
-      // Find the first field with an error in the response data
-      const fieldWithError = Object.keys(fieldErrorMapping).find(
-        (field) => errors[field]
-      );
-
-      // If a field with an error is found, update the form error state using setError
-      if (fieldWithError) {
-        // Use the ValidFieldNames type to ensure the correct field names
-        setError(fieldErrorMapping[fieldWithError], {
-          type: "server",
-          message: errors[fieldWithError],
-        });
+        if (result.error?.code === "23505") {
+          setError("exerciseName", {
+            type: "manual",
+            message: "An exercise with this name already exists",
+          });
+        } else {
+          alert("Failed to insert exercise. Please try again.");
+        }
       }
     } catch (error) {
+      console.error("error submitting form:", error);
       alert("Submitting form failed!");
     }
   };

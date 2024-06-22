@@ -40,3 +40,28 @@ export type ValidFieldNames =
   | "isTimeBased"
   | "primaryMuscleGroupId"
   | "secondaryMuscleGroupId";
+
+export type UserProfile = {
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  gender: string;
+  date_of_birth: string | null;
+  height: string | null;
+  weight: string | null;
+  is_imperial: boolean | null;
+  email: string | null;
+  created_at: string | null;
+  username: string | null;
+  password: string | null;
+};
+
+export type NewExercise = {
+  name: string;
+  description: string | null;
+  is_time_based: boolean;
+  primary_muscle_group_id: number | null | undefined;
+  secondary_muscle_group_id: number | null;
+  user_id: number;
+  is_template: boolean;
+};
