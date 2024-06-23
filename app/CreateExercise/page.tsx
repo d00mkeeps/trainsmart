@@ -1,5 +1,5 @@
 "use client";
-
+import ReactSelectField from "../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FormField from "./FormField";
@@ -12,29 +12,32 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(url, key);
 const muscleGroups = [
-  { key: 222, value: "Choose..." },
-  { key: 1, value: "Calves" },
-  { key: 2, value: "Quads" },
-  { key: 3, value: "Hamstrings" },
-  { key: 4, value: "Glutes" },
-  { key: 5, value: "Hip flexors" },
   { key: 6, value: "Abdominals" },
-  { key: 7, value: "Obliques" },
-  { key: 8, value: "Lower back" },
-  { key: 9, value: "Lats" },
-  { key: 10, value: "Traps" },
-  { key: 11, value: "Chest" },
-  { key: 12, value: "Rear delts" },
-  { key: 13, value: "Lateral delts" },
-  { key: 14, value: "Front delts" },
   { key: 15, value: "Biceps" },
-  { key: 16, value: "Triceps" },
-  { key: 17, value: "Forearms" },
+  { key: 1, value: "Calves" },
   { key: 18, value: "Cardiovascular system" },
+  { key: 11, value: "Chest" },
+  { key: 17, value: "Forearms" },
+  { key: 14, value: "Front delts" },
+  { key: 4, value: "Glutes" },
+  { key: 3, value: "Hamstrings" },
+  { key: 5, value: "Hip flexors" },
+  { key: 9, value: "Lats" },
+  { key: 13, value: "Lateral delts" },
+  { key: 8, value: "Lower back" },
+  { key: 7, value: "Obliques" },
+  { key: 2, value: "Quads" },
+  { key: 12, value: "Rear delts" },
+  { key: 10, value: "Traps" },
+  { key: 16, value: "Triceps" },
 ];
 
 function Form() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const muscleGroupOptions = muscleGroups.map(group => ({
+    value: group.key,
+    label: group.value
+  }));
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {
     register,
@@ -42,6 +45,7 @@ function Form() {
     formState: { errors },
     setError,
     reset,
+    control,
   } = useForm<FormData>({
     resolver: zodResolver(UserSchema), // Apply the zodResolver
   });
@@ -140,36 +144,20 @@ function Form() {
           valueAsNumber
         />
 
-        <FormField
-          type="select"
-          name="primaryMuscleGroupId"
-          label="Primary Muscle Group"
-          register={register}
-          error={errors.primaryMuscleGroupId}
-          valueAsNumber
-          required={true}
-        >
-          {muscleGroups.map(({ key, value }) => (
-            <option key={key} value={key}>
-              {value}
-            </option>
-          ))}
-        </FormField>
-
-        <FormField
-          type="select"
-          name="secondaryMuscleGroupId"
-          label="Secondary Muscle Group"
-          register={register}
-          error={errors.secondaryMuscleGroupId}
-          valueAsNumber
-        >
-          {muscleGroups.map(({ key, value }) => (
-            <option key={key} value={key}>
-              {value}
-            </option>
-          ))}
-        </FormField>
+<ReactSelectField<FormData>
+        name="primaryMuscleGroupId"
+        label="Primary Muscle Group"
+        options={muscleGroupOptions}
+        control={control}
+        isClearable
+      />
+      <ReactSelectField<FormData>
+        name="secondaryMuscleGroupId"
+        label="Secondary Muscle Group"
+        options={muscleGroupOptions}
+        control={control}
+        isClearable
+      />
 
         <button type="submit" className="submit-button" disabled={isSubmitted}>
           {isSubmitted ? "Exercise created!" : "Create"}
