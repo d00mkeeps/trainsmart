@@ -1,11 +1,11 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FormField from "./FormField";
 import { FormData, UserSchema, UserProfile, NewExercise } from "../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import fetchUserProfiles, {
-  insertExercise,
-} from "./userprofile/supabaseFunctions";
+import fetchUserProfiles, { insertExercise } from "../supabaseFunctions";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -34,14 +34,24 @@ const muscleGroups = [
 ];
 
 function Form() {
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(UserSchema), // Apply the zodResolver
+  });
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isSubmitted) {
+      timer = setTimeout(() => {
+        setIsSubmitted(false);
+      }, 1000);
+    }
   });
   useEffect(() => {
     async function loadUserProfile() {
@@ -78,6 +88,9 @@ function Form() {
       const result = await insertExercise(supabase, newData);
       if (result.success) {
         console.log("Exercise inserted successfully:", result);
+        setIsSubmitted(true);
+        //reset form here
+        reset();
       } else {
         console.log("Failed to insert exercise:", result.error);
 
@@ -158,8 +171,8 @@ function Form() {
           ))}
         </FormField>
 
-        <button type="submit" className="submit-button">
-          Submit
+        <button type="submit" className="submit-button" disabled={isSubmitted}>
+          {isSubmitted ? "Exercise created!" : "Create"}
         </button>
       </div>
     </form>

@@ -73,3 +73,7 @@ textarea {
   resize: vertical;
   min-height: 100px;
 }
+
+.submit-button.submitted {
+  background-color: #2ccc2b;
+}
