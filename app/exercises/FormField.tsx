@@ -1,6 +1,7 @@
-import { FormFieldProps } from "@/types";
-
-const FormField: React.FC<FormFieldProps> = ({
+import { FormFieldProps, ExerciseData } from "@/types";
+import React from "react";
+import { Path } from "react-hook-form";
+function FormField<T extends ExerciseData = ExerciseData>({
   type,
   placeholder,
   name,
@@ -10,7 +11,7 @@ const FormField: React.FC<FormFieldProps> = ({
   label,
   required,
   children,
-}) => {
+}: FormFieldProps<T>): React.ReactElement {
   const renderField = () => {
     switch (type) {
       case "text":
@@ -19,19 +20,26 @@ const FormField: React.FC<FormFieldProps> = ({
           <input
             type={type}
             placeholder={placeholder}
-            {...register(name, {
+            {...register(name as Path<T>, {
               required: required && "This field is required",
               valueAsNumber,
             })}
           />
         );
       case "textarea":
-        return <textarea placeholder={placeholder} {...register(name)} />;
+        return (
+          <textarea placeholder={placeholder} {...register(name as Path<T>)} />
+        );
       case "boolean":
-        return <input type="checkbox" {...register(name, { valueAsNumber })} />;
+        return (
+          <input
+            type="checkbox"
+            {...register(name as Path<T>, { valueAsNumber })}
+          />
+        );
       case "select":
         return (
-          <select {...register(name, { required, valueAsNumber })}>
+          <select {...register(name as Path<T>, { required, valueAsNumber })}>
             {children}
           </select>
         );
@@ -42,11 +50,11 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div>
-      {label && <label htmlFor={name}>{label}</label>}
+      {label && <label htmlFor={String(name)}>{label}</label>}
       {renderField()}
       {error && <span className="error-message">{error.message}</span>}
     </div>
   );
-};
+}
 
 export default FormField;

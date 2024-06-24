@@ -1,11 +1,18 @@
 "use client";
-import ReactSelectField from "../components/ReactSelectField";
+import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import FormField from "./FormField";
-import { FormData, UserSchema, UserProfile, NewExercise } from "../../types";
+import FormField from "../FormField";
+import {
+  FormData,
+  UserSchema,
+  UserProfile,
+  NewExercise,
+  CreateExerciseFormData,
+  CreateExerciseSchema,
+} from "../../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import fetchUserProfiles, { insertExercise } from "../supabaseFunctions";
+import fetchUserProfiles, { insertExercise } from "../../supabasefunctions";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -34,9 +41,9 @@ const muscleGroups = [
 
 function Form() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const muscleGroupOptions = muscleGroups.map(group => ({
+  const muscleGroupOptions = muscleGroups.map((group) => ({
     value: group.key,
-    label: group.value
+    label: group.value,
   }));
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {
@@ -46,8 +53,8 @@ function Form() {
     setError,
     reset,
     control,
-  } = useForm<FormData>({
-    resolver: zodResolver(UserSchema), // Apply the zodResolver
+  } = useForm<CreateExerciseFormData>({
+    resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
   });
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -68,7 +75,7 @@ function Form() {
     }
     loadUserProfile();
   }, []);
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: CreateExerciseFormData) => {
     if (!userProfile) {
       console.error("user profile not loaded");
       return;
@@ -144,20 +151,20 @@ function Form() {
           valueAsNumber
         />
 
-<ReactSelectField<FormData>
-        name="primaryMuscleGroupId"
-        label="Primary Muscle Group"
-        options={muscleGroupOptions}
-        control={control}
-        isClearable
-      />
-      <ReactSelectField<FormData>
-        name="secondaryMuscleGroupId"
-        label="Secondary Muscle Group"
-        options={muscleGroupOptions}
-        control={control}
-        isClearable
-      />
+        <ReactSelectField<CreateExerciseFormData>
+          name="primaryMuscleGroupId"
+          label="Primary Muscle Group"
+          options={muscleGroupOptions}
+          control={control}
+          isClearable
+        />
+        <ReactSelectField<CreateExerciseFormData>
+          name="secondaryMuscleGroupId"
+          label="Secondary Muscle Group"
+          options={muscleGroupOptions}
+          control={control}
+          isClearable
+        />
 
         <button type="submit" className="submit-button" disabled={isSubmitted}>
           {isSubmitted ? "Exercise created!" : "Create"}

@@ -1,19 +1,21 @@
-import React from 'react';
-import Select, { StylesConfig, SingleValue } from 'react-select';
-import { useController, Control, FieldValues, Path } from 'react-hook-form';
+import React from "react";
+import Select, { StylesConfig, SingleValue } from "react-select";
+import { useController, Control, FieldValues, Path } from "react-hook-form";
 
 interface Option {
-  value: number;
+  value: number | string;
   label: string;
 }
 
 interface ReactSelectProps<TFieldValues extends FieldValues> {
   name: Path<TFieldValues>;
+  options: { value: number | string; label: string }[];
   control: Control<TFieldValues>;
-  options: Option[];
-  label: string;
+  label?: string;
+  value?: { value: number; label: string } | number;
   placeholder?: string;
   isClearable?: boolean;
+  onChange?: (option: any) => void;
 }
 
 function ReactSelectField<TFieldValues extends FieldValues>({
@@ -21,12 +23,12 @@ function ReactSelectField<TFieldValues extends FieldValues>({
   control,
   options,
   label,
-  placeholder = 'Select...',
+  placeholder = "Select...",
   isClearable = false,
 }: ReactSelectProps<TFieldValues>) {
   const {
     field: { onChange, onBlur, value, ref },
-    fieldState: { error }
+    fieldState: { error },
   } = useController({
     name,
     control,
@@ -35,11 +37,12 @@ function ReactSelectField<TFieldValues extends FieldValues>({
   const selectStyles: StylesConfig<Option, false> = {
     control: (provided) => ({
       ...provided,
-      borderColor: error ? 'red' : provided.borderColor,
+      borderColor: error ? "red" : provided.borderColor,
     }),
   };
 
-  const getValue = () => options.find(option => option.value === value) || null;
+  const getValue = () =>
+    options.find((option) => option.value === value) || null;
 
   const handleChange = (newValue: SingleValue<Option>) => {
     onChange(newValue?.value);
@@ -47,7 +50,10 @@ function ReactSelectField<TFieldValues extends FieldValues>({
 
   return (
     <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+      <label
+        className="block text-gray-700 text-sm font-bold mb-2"
+        htmlFor={name}
+      >
         {label}
       </label>
       <Select<Option, false>

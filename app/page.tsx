@@ -9,10 +9,10 @@ const Header = () => (
       <nav>
         <ul className="flex space-x-4">
           <li>
-            <NavButton href="/CreateExercise">Create Exercise</NavButton>
+            <NavButton href="./exercises/create">Create Exercise</NavButton>
           </li>
           <li>
-            <NavButton href="/exercises">Exercises</NavButton>
+            <NavButton href="/exercises/edit">Edit Exercise</NavButton>
           </li>
           <li>
             <NavButton href="/workouts">Workouts</NavButton>
