@@ -15,6 +15,7 @@ interface ReactSelectProps<TFieldValues extends FieldValues> {
   placeholder?: string;
   isClearable?: boolean;
   onChange?: (selectedOption: Option | null) => number | string | null;
+  onExerciseSelect?: (exerciseId: number | string) => void
 }
 
 function ReactSelectField<TFieldValues extends FieldValues>({
@@ -25,6 +26,7 @@ function ReactSelectField<TFieldValues extends FieldValues>({
   onChange,
   placeholder = "Select...",
   isClearable = false,
+  onExerciseSelect,
 }: ReactSelectProps<TFieldValues>) {
   const selectStyles: StylesConfig<Option, false> = {
     control: (provided, state) => ({
@@ -49,6 +51,9 @@ function ReactSelectField<TFieldValues extends FieldValues>({
             options={options}
             onChange={(selectedOption) => {
               onChange(selectedOption?.value ?? null);
+              if (onExerciseSelect && selectedOption) {
+                onExerciseSelect(selectedOption.value)
+              }
             }}
             onBlur={onBlur}
             value={options.find((option) => option.value === value)}

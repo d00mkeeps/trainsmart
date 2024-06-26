@@ -5,11 +5,8 @@ import { useForm } from "react-hook-form";
 import FormField from "../FormField";
 import {
   UserProfile,
-  NewExercise,
   CreateExerciseFormData,
   CreateExerciseSchema,
-  EditExerciseFormData,
-  Exercise,
   RetrievedExercise,
   ExerciseData,
 } from "../../../types";
@@ -17,10 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import fetchUserProfiles, {
   fetchUserExercises,
   updateExercise,
-} from "../../supabasefunctions";
+} from "../../supabaseFunctions";
 import { createClient } from "@supabase/supabase-js";
-import { fetchServerResponse } from "next/dist/client/components/router-reducer/fetch-server-response";
-import { SingleValue } from "react-select/animated";
+import { setEnvironmentData } from "worker_threads";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -61,9 +57,21 @@ function Form() {
     setError,
     reset,
     control,
+    setValue,
   } = useForm<CreateExerciseFormData>({
     resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
   });
+  const handleExerciseSelect = (exerciseId: number| string ) => {
+    const selectedExercise = exercises.find(ex => ex.id === exerciseId)
+      if(selectedExercise) {
+      setValue('exerciseName', selectedExercise.name);
+      setValue('exerciseDescription', selectedExercise.description || undefined);
+      setValue('isTimeBased', selectedExercise.is_time_based);
+      setValue('primaryMuscleGroupId', selectedExercise.primary_muscle_group_id);
+      setValue('secondaryMuscleGroupId', selectedExercise.secondary_muscle_group_id || undefined);
+      }
+    
+  }
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isSubmitted) {
@@ -95,7 +103,7 @@ function Form() {
       }
     }
     loadExercises();
-  }, []);
+  }, [userProfile]);
   console.log(exercises);
 
   //TODO: consiter looking over typing to find possible simplifications
@@ -104,7 +112,6 @@ function Form() {
       console.error("user profile not loaded");
       return;
     }
-    console.log("form data: ", data);
     if (!data.selectedExerciseId) {
       console.error("No exercise selected");
       setError("selectedExerciseId", {
@@ -125,7 +132,7 @@ function Form() {
         user_id: userProfile.user_id,
         is_template: false,
       };
-      console.log("updated exercise:", updatedExercise);
+ 
 
       const result = await updateExercise(supabase, updatedExercise);
       if (result.success) {
@@ -144,7 +151,7 @@ function Form() {
     value: ex.id,
     label: ex.name,
   }));
-  console.log(exerciseOptions[0]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="grid col-auto">
@@ -155,6 +162,7 @@ function Form() {
           options={exerciseOptions}
           control={control}
           isClearable
+          onExerciseSelect={handleExerciseSelect}
         />
         <FormField
           type="text"
@@ -163,6 +171,7 @@ function Form() {
           register={register}
           error={errors.exerciseName}
           required={true}
+
         />
         <FormField
           type="textarea"
