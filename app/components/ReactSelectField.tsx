@@ -1,6 +1,6 @@
 import React from "react";
 import Select, { StylesConfig, SingleValue } from "react-select";
-import { useController, Control, FieldValues, Path } from "react-hook-form";
+import { Controller, Control, FieldValues, Path } from "react-hook-form";
 
 interface Option {
   value: number | string;
@@ -12,10 +12,9 @@ interface ReactSelectProps<TFieldValues extends FieldValues> {
   options: { value: number | string; label: string }[];
   control: Control<TFieldValues>;
   label?: string;
-  value?: { value: number; label: string } | number;
   placeholder?: string;
   isClearable?: boolean;
-  onChange?: (option: any) => void;
+  onChange?: (selectedOption: Option | null) => number | string | null;
 }
 
 function ReactSelectField<TFieldValues extends FieldValues>({
@@ -23,29 +22,15 @@ function ReactSelectField<TFieldValues extends FieldValues>({
   control,
   options,
   label,
+  onChange,
   placeholder = "Select...",
   isClearable = false,
 }: ReactSelectProps<TFieldValues>) {
-  const {
-    field: { onChange, onBlur, value, ref },
-    fieldState: { error },
-  } = useController({
-    name,
-    control,
-  });
-
   const selectStyles: StylesConfig<Option, false> = {
-    control: (provided) => ({
+    control: (provided, state) => ({
       ...provided,
-      borderColor: error ? "red" : provided.borderColor,
+      borderColor: state.isFocused ? "blue" : provided.borderColor,
     }),
-  };
-
-  const getValue = () =>
-    options.find((option) => option.value === value) || null;
-
-  const handleChange = (newValue: SingleValue<Option>) => {
-    onChange(newValue?.value);
   };
 
   return (
@@ -56,19 +41,24 @@ function ReactSelectField<TFieldValues extends FieldValues>({
       >
         {label}
       </label>
-      <Select<Option, false>
-        options={options}
-        onChange={handleChange}
-        onBlur={onBlur}
-        value={getValue()}
+      <Controller
         name={name}
-        ref={ref}
-        placeholder={placeholder}
-        isClearable={isClearable}
-        classNamePrefix="react-select"
-        styles={selectStyles}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Select<Option, false>
+            options={options}
+            onChange={(selectedOption) => {
+              onChange(selectedOption?.value ?? null);
+            }}
+            onBlur={onBlur}
+            value={options.find((option) => option.value === value)}
+            placeholder={placeholder}
+            isClearable={isClearable}
+            classNamePrefix="react-select"
+            styles={selectStyles}
+          />
+        )}
       />
-      {error && <p className="text-red-500 text-xs italic">{error.message}</p>}
     </div>
   );
 }

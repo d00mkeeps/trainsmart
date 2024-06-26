@@ -3,6 +3,7 @@ import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
 
 // Common exercise data structure
 export type ExerciseData = {
+  selectedExerciseId: number | null;
   exerciseName: string;
   exerciseDescription?: string;
   isTimeBased: boolean;
@@ -10,16 +11,14 @@ export type ExerciseData = {
   secondaryMuscleGroupId?: number;
 };
 
-// Form data for creating a new exercise
 export type CreateExerciseFormData = ExerciseData;
 
-// Form data for editing an exercise
 export type EditExerciseFormData = ExerciseData & {
-  exerciseId: number; // Include the ID for editing
+  exerciseId: number;
 };
-
 // Zod schema for exercise data
 const exerciseDataSchema = z.object({
+  selectedExerciseId: z.number().optional(),
   exerciseName: z.string().min(1, "Exercise name is required"),
   exerciseDescription: z.string().optional(),
   isTimeBased: z.boolean(),
@@ -39,6 +38,7 @@ export const EditExerciseSchema = exerciseDataSchema.extend({
 
 // Keeping your existing types
 export type UserProfile = {
+  id: number;
   user_id: number;
   first_name: string;
   last_name: string;
@@ -87,17 +87,3 @@ export type FormFieldProps<T extends ExerciseData = ExerciseData> = {
   children?: React.ReactNode;
   required?: boolean;
 };
-
-// Keeping the existing UserSchema for backwards compatibility
-export const UserSchema = z.object({
-  exerciseName: z.string().min(1, "Required"),
-  exerciseDescription: z.string().optional(),
-  isTimeBased: z.boolean(),
-  primaryMuscleGroupId: z.number().refine((val) => val !== 222, {
-    message: "Please choose a primary muscle group",
-  }),
-  secondaryMuscleGroupId: z.number().optional(),
-});
-
-// You might want to keep this for backwards compatibility
-export type FormData = z.infer<typeof UserSchema>;

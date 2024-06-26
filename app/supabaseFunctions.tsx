@@ -67,18 +67,19 @@ export async function fetchUserExercises(
     console.error("Error fetching exercises:", error);
     return null;
   }
-  return data;
+  const userExercises = data;
+  return userExercises;
 }
 
 export async function updateExercise(
   supabase: SupabaseClient<any, "public", any>,
   exerciseData: {
-    id: any;
+    id: number;
     name?: string;
-    description?: string | undefined;
+    description?: string | null;
     is_time_based?: boolean;
     primary_muscle_group_id?: number;
-    secondary_muscle_group_id?: number | undefined;
+    secondary_muscle_group_id?: number | null;
     user_id?: number;
     is_template?: boolean;
   }
@@ -86,7 +87,15 @@ export async function updateExercise(
   try {
     const { data, error } = await supabase
       .from("exercises")
-      .update(exerciseData)
+      .update({
+        name: exerciseData.name,
+        description: exerciseData.description,
+        is_time_based: exerciseData.is_time_based,
+        primary_muscle_group_id: exerciseData.primary_muscle_group_id,
+        secondary_muscle_group_id: exerciseData.secondary_muscle_group_id,
+        user_id: exerciseData.user_id,
+        is_template: exerciseData.is_template,
+      })
       .eq("id", exerciseData.id)
       .single();
 

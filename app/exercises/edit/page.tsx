@@ -1,66 +1,88 @@
 "use client";
 import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import FormField from "../FormField";
 import {
-  FormData,
-  UserSchema,
   UserProfile,
-  RetrievedExercise,
-  Exercise,
+  NewExercise,
+  CreateExerciseFormData,
+  CreateExerciseSchema,
   EditExerciseFormData,
-  EditExerciseSchema,
+  Exercise,
+  RetrievedExercise,
+  ExerciseData,
 } from "../../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchUserExercises, updateExercise } from "../../supabasefunctions";
+import fetchUserProfiles, {
+  fetchUserExercises,
+  updateExercise,
+} from "../../supabasefunctions";
 import { createClient } from "@supabase/supabase-js";
+import { fetchServerResponse } from "next/dist/client/components/router-reducer/fetch-server-response";
+import { SingleValue } from "react-select/animated";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(url, key);
-
 const muscleGroups = [
-  { value: 6, label: "Abdominals" },
-  { value: 15, label: "Biceps" },
-  { value: 1, label: "Calves" },
-  { value: 18, label: "Cardiovascular system" },
-  { value: 11, label: "Chest" },
-  { value: 17, label: "Forearms" },
-  { value: 14, label: "Front delts" },
-  { value: 4, label: "Glutes" },
-  { value: 3, label: "Hamstrings" },
-  { value: 5, label: "Hip flexors" },
-  { value: 9, label: "Lats" },
-  { value: 13, label: "Lateral delts" },
-  { value: 8, label: "Lower back" },
-  { value: 7, label: "Obliques" },
-  { value: 2, label: "Quads" },
-  { value: 12, label: "Rear delts" },
-  { value: 10, label: "Traps" },
-  { value: 16, label: "Triceps" },
+  { key: 6, value: "Abdominals" },
+  { key: 15, value: "Biceps" },
+  { key: 1, value: "Calves" },
+  { key: 18, value: "Cardiovascular system" },
+  { key: 11, value: "Chest" },
+  { key: 17, value: "Forearms" },
+  { key: 14, value: "Front delts" },
+  { key: 4, value: "Glutes" },
+  { key: 3, value: "Hamstrings" },
+  { key: 5, value: "Hip flexors" },
+  { key: 9, value: "Lats" },
+  { key: 13, value: "Lateral delts" },
+  { key: 8, value: "Lower back" },
+  { key: 7, value: "Obliques" },
+  { key: 2, value: "Quads" },
+  { key: 12, value: "Rear delts" },
+  { key: 10, value: "Traps" },
+  { key: 16, value: "Triceps" },
 ];
 
-function EditExerciseForm() {
+function Form() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const muscleGroupOptions = muscleGroups.map((group) => ({
+    value: group.key,
+    label: group.value,
+  }));
   const [exercises, setExercises] = useState<RetrievedExercise[]>([]);
-  const [selectedExercise, setSelectedExercise] =
-    useState<RetrievedExercise | null>(null);
-
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
     reset,
     control,
-    setValue,
-  } = useForm<EditExerciseFormData>({
-    defaultValues: {
-      exerciseName: "",
-    },
-    resolver: zodResolver(EditExerciseSchema),
+  } = useForm<CreateExerciseFormData>({
+    resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
   });
-
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isSubmitted) {
+      timer = setTimeout(() => {
+        setIsSubmitted(false);
+      }, 1000);
+    }
+  });
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const userProfile = await fetchUserProfiles();
+        setUserProfile(userProfile);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    }
+    loadUserProfile();
+  }, []);
   useEffect(() => {
     async function loadExercises() {
       try {
@@ -74,78 +96,82 @@ function EditExerciseForm() {
     }
     loadExercises();
   }, []);
+  console.log(exercises);
 
-  const onSubmit = async (data: EditExerciseFormData) => {
-    if (!selectedExercise) {
+  //TODO: consiter looking over typing to find possible simplifications
+  const onSubmit = async (data: ExerciseData) => {
+    if (!userProfile) {
+      console.error("user profile not loaded");
+      return;
+    }
+    console.log("form data: ", data);
+    if (!data.selectedExerciseId) {
       console.error("No exercise selected");
+      setError("selectedExerciseId", {
+        type: "manual",
+        message: "Please select an exercise",
+      });
       return;
     }
 
     try {
-      const updatedData = {
-        id: selectedExercise.id,
-        name: selectedExercise.name,
-        description: data.exerciseDescription,
+      const updatedExercise = {
+        id: data.selectedExerciseId,
+        name: data.exerciseName,
+        description: data.exerciseDescription ?? null,
         is_time_based: data.isTimeBased,
         primary_muscle_group_id: data.primaryMuscleGroupId,
-        secondary_muscle_group_id: data.secondaryMuscleGroupId,
-        user_id: selectedExercise.user_id,
-        is_template: selectedExercise.is_template,
+        secondary_muscle_group_id: data.secondaryMuscleGroupId ?? null,
+        user_id: userProfile.user_id,
+        is_template: false,
       };
+      console.log("updated exercise:", updatedExercise);
 
-      const result = await updateExercise(supabase, updatedData);
+      const result = await updateExercise(supabase, updatedExercise);
       if (result.success) {
         console.log("Exercise updated successfully:", result);
         setIsSubmitted(true);
-        setTimeout(() => setIsSubmitted(false), 1000);
+        reset();
       } else {
         console.log("Failed to update exercise:", result.error);
-        alert("Failed to update exercise. Please try again.");
       }
     } catch (error) {
       console.error("error submitting form:", error);
       alert("Submitting form failed!");
     }
   };
-
   const exerciseOptions = exercises.map((ex) => ({
     value: ex.id,
     label: ex.name,
   }));
-
+  console.log(exerciseOptions[0]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="grid col-auto">
-        <h1 className="text-3xl font-bold mb-4">Edit Exercise</h1>
-        <Controller
-          name="exerciseName"
+        <h1 className="text-3xl font-bold mb-4">Edit Exercises</h1>
+        <ReactSelectField<CreateExerciseFormData>
+          name="selectedExerciseId"
+          label="Choose an exercise"
+          options={exerciseOptions}
           control={control}
-          render={({ field }) => (
-            <ReactSelectField<EditExerciseFormData>
-              {...field}
-              options={exerciseOptions}
-              label="Exercise Name"
-              value={
-                exerciseOptions.find(
-                  (option) => String(option.value) === String(field.value)
-                ) || undefined
-              }
-              onChange={(selectedOption) =>
-                field.onChange(selectedOption?.value)
-              }
-              control={control}
-            />
-          )}
+          isClearable
         />
-        ;
-        <FormField<EditExerciseFormData>
+        <FormField
+          type="text"
+          placeholder="exercise name"
+          name="exerciseName"
+          register={register}
+          error={errors.exerciseName}
+          required={true}
+        />
+        <FormField
           type="textarea"
           placeholder="description (optional)"
           name="exerciseDescription"
           register={register}
           error={errors.exerciseDescription}
         />
-        <FormField<EditExerciseFormData>
+        <FormField
           type="boolean"
           label="Is this a time based exercise?"
           name="isTimeBased"
@@ -153,42 +179,26 @@ function EditExerciseForm() {
           error={errors.isTimeBased}
           valueAsNumber
         />
-        <Controller
+        <ReactSelectField<CreateExerciseFormData>
           name="primaryMuscleGroupId"
+          label="Primary Muscle Group"
+          options={muscleGroupOptions}
           control={control}
-          render={({ field }) => (
-            <ReactSelectField<EditExerciseFormData>
-              {...field}
-              options={muscleGroups}
-              label="Primary Muscle Group"
-              isClearable
-              control={control}
-            />
-          )}
+          isClearable
         />
-        <Controller
+        <ReactSelectField<CreateExerciseFormData>
           name="secondaryMuscleGroupId"
+          label="Secondary Muscle Group"
+          options={muscleGroupOptions}
           control={control}
-          render={({ field }) => (
-            <ReactSelectField<EditExerciseFormData>
-              {...field}
-              options={muscleGroups}
-              label="Secondary Muscle Group"
-              isClearable
-              control={control}
-            />
-          )}
+          isClearable
         />
-        <button
-          type="submit"
-          className="submit-button"
-          disabled={isSubmitted || !selectedExercise}
-        >
-          {isSubmitted ? "Exercise updated!" : "Update"}
+        <button type="submit" className="submit-button" disabled={isSubmitted}>
+          {isSubmitted ? "Exercise edited!" : "Update"}
         </button>
       </div>
     </form>
   );
 }
 
-export default EditExerciseForm;
+export default Form;

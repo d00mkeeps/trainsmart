@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FormField from "../FormField";
 import {
-  FormData,
-  UserSchema,
   UserProfile,
   NewExercise,
   CreateExerciseFormData,
