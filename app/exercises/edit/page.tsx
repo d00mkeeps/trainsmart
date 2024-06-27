@@ -14,9 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import fetchUserProfiles, {
   fetchUserExercises,
   updateExercise,
-} from "../../supabaseFunctions";
+} from "../../supabasefunctions";
 import { createClient } from "@supabase/supabase-js";
-import { setEnvironmentData } from "worker_threads";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -61,17 +60,25 @@ function Form() {
   } = useForm<CreateExerciseFormData>({
     resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
   });
-  const handleExerciseSelect = (exerciseId: number| string ) => {
-    const selectedExercise = exercises.find(ex => ex.id === exerciseId)
-      if(selectedExercise) {
-      setValue('exerciseName', selectedExercise.name);
-      setValue('exerciseDescription', selectedExercise.description || undefined);
-      setValue('isTimeBased', selectedExercise.is_time_based);
-      setValue('primaryMuscleGroupId', selectedExercise.primary_muscle_group_id);
-      setValue('secondaryMuscleGroupId', selectedExercise.secondary_muscle_group_id || undefined);
-      }
-    
-  }
+  const handleExerciseSelect = (exerciseId: number | string) => {
+    const selectedExercise = exercises.find((ex) => ex.id === exerciseId);
+    if (selectedExercise) {
+      setValue("exerciseName", selectedExercise.name);
+      setValue(
+        "exerciseDescription",
+        selectedExercise.description || undefined
+      );
+      setValue("isTimeBased", selectedExercise.is_time_based);
+      setValue(
+        "primaryMuscleGroupId",
+        selectedExercise.primary_muscle_group_id
+      );
+      setValue(
+        "secondaryMuscleGroupId",
+        selectedExercise.secondary_muscle_group_id || undefined
+      );
+    }
+  };
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isSubmitted) {
@@ -132,7 +139,6 @@ function Form() {
         user_id: userProfile.user_id,
         is_template: false,
       };
- 
 
       const result = await updateExercise(supabase, updatedExercise);
       if (result.success) {
@@ -171,7 +177,6 @@ function Form() {
           register={register}
           error={errors.exerciseName}
           required={true}
-
         />
         <FormField
           type="textarea"

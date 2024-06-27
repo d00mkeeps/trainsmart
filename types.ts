@@ -1,7 +1,12 @@
 import { z } from "zod";
-import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
+import {
+  FieldError,
+  Path,
+  RegisterOptions,
+  UseFormRegister,
+} from "react-hook-form";
 
-// Common exercise data structure
+// Exercise types/schemas
 export type ExerciseData = {
   selectedExerciseId: number | null;
   exerciseName: string;
@@ -9,6 +14,17 @@ export type ExerciseData = {
   isTimeBased: boolean;
   primaryMuscleGroupId: number;
   secondaryMuscleGroupId?: number;
+};
+export type Exercise = {
+  id: number;
+  name: string;
+  description?: string | null | undefined;
+  is_time_based: boolean;
+  primary_muscle_group_id: number;
+  secondary_muscle_group_id?: number | null;
+  user_id: number;
+  is_template: boolean;
+  time_created: string;
 };
 
 export type CreateExerciseFormData = ExerciseData;
@@ -28,10 +44,8 @@ const exerciseDataSchema = z.object({
   secondaryMuscleGroupId: z.number().optional(),
 });
 
-// Schema for creating a new exercise
 export const CreateExerciseSchema = exerciseDataSchema;
 
-// Schema for editing an exercise
 export const EditExerciseSchema = exerciseDataSchema.extend({
   exerciseId: z.number(),
 });
@@ -51,18 +65,6 @@ export type UserProfile = {
   created_at: string | null;
   username: string | null;
   password: string | null;
-};
-
-export type Exercise = {
-  id: number;
-  name: string;
-  description?: string | null | undefined;
-  is_time_based: boolean;
-  primary_muscle_group_id: number;
-  secondary_muscle_group_id?: number | null;
-  user_id: number;
-  is_template: boolean;
-  time_created: string;
 };
 
 export type NewExercise = Omit<Exercise, "id" | "time_created">;
@@ -86,4 +88,56 @@ export type FormFieldProps<T extends ExerciseData = ExerciseData> = {
   validationOptions?: RegisterOptions;
   children?: React.ReactNode;
   required?: boolean;
+};
+//Program types and schemas
+export const CreateProgramSchema = z.object({
+  name: z.string().min(1, "Program name is required"),
+  description: z.string().optional(),
+  workouts: z.array(
+    z.object({
+      day: z.object({
+        value: z.string(),
+        label: z.string(),
+      }),
+      exercises: z.array(
+        z.object({
+          name: z.string().min(1, "Exercise name is required"),
+        })
+      ),
+    })
+  ),
+});
+
+export interface ProgramFormData {
+  name: string;
+  description?: string;
+  isRestDay: boolean;
+  day: {
+    value: string;
+    label: string;
+  };
+  workouts: any;
+}
+
+export type CreateProgramFormData = z.infer<typeof CreateProgramSchema>;
+
+export type ProgramFormFields = {
+  name: string;
+  description?: string;
+  workouts: Array<{
+    day: { value: string; label: string };
+    exercises: Array<{ name: string }>;
+  }>;
+};
+
+export type ProgramFormFieldProps = {
+  type: "text" | "textarea" | "select";
+  label: string;
+  name: Path<CreateProgramFormData>;
+  register: UseFormRegister<CreateProgramFormData>;
+  error?: FieldError;
+  required?: boolean;
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+  onChange?: (value: any) => void;
 };
