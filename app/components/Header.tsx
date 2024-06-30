@@ -15,10 +15,10 @@ const Header = () => (
             <NavButton href="/exercises/edit">Edit Exercise</NavButton>
           </li>
           <li>
-            <NavButton href="/workouts">Workouts</NavButton>
+            <NavButton href="/programs">Programs</NavButton>
           </li>
           <li>
-            <NavButton href="/profile">Profile</NavButton>
+            <NavButton href="/programs/create">Create Program</NavButton>
           </li>
         </ul>
       </nav>

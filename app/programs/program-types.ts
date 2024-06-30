@@ -57,3 +57,10 @@ export type ProgramFormFieldProps = {
   options?: { value: string; label: string }[];
   onChange?: (value: any) => void;
 };
+
+export interface Program {
+  id: number;
+  name: string;
+  description: string | null;
+  time: string;
+}
