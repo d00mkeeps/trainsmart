@@ -1,6 +1,7 @@
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { errorMonitor } from "stream";
 import { RetrievedExercise, UserProfile, NewExercise } from "@/types";
+import { CreateProgramFormData } from "./programs/program-types";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -104,5 +105,26 @@ export async function updateExercise(
   } catch (error) {
     console.error("Error updating exercise:", error);
     return { success: false, error };
+  }
+}
+export async function insertProgram(
+  programData: CreateProgramFormData,
+  userId: number
+) {
+  try {
+    const { data, error } = await supabase
+      .from("programs")
+      .insert({
+        name: programData.programName,
+        description: programData.description,
+        user_id: userId,
+      })
+      .select();
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error creating program:", error);
+    return { success: false, error: error };
   }
 }

@@ -1,11 +1,12 @@
 "use client";
 
-//imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { CreateProgramFormData } from "../program-types";
 import ProgramFormField from "../ProgramFormField";
+import fetchUserProfiles, { insertProgram } from "@/app/supabasefunctions";
+import { UserProfile } from "@/types";
 
 const CreateProgram: React.FC = () => {
   const {
@@ -13,17 +14,75 @@ const CreateProgram: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateProgramFormData>();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-  const onSubmit: SubmitHandler<CreateProgramFormData> = (data) => {
-    console.log("Program submitted: ", data);
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const userProfile = await fetchUserProfiles();
+        setUserProfile(userProfile);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        setMessage({ type: "error", text: "Failed to load user profile" });
+      }
+    }
+    loadUserProfile();
+  }, []);
+
+  const onSubmit: SubmitHandler<CreateProgramFormData> = async (data) => {
+    if (!userProfile) {
+      setMessage({ type: "error", text: "User profile not found" });
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const result = await insertProgram(data, userProfile.user_id);
+      if (result.success) {
+        console.log("Program created successfully:", result.data);
+        setMessage({ type: "success", text: "Program created successfully!" });
+        // You could redirect the user or clear the form here
+      } else {
+        console.error("Error creating program:", result.error);
+        setMessage({
+          type: "error",
+          text: "Failed to create program. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating program:", error);
+      setMessage({
+        type: "error",
+        text: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-  //TODO: add actual submission logic here
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
       <main className="container mx-auto mt-8 p-4">
         <h1 className="text-2xl font-semibold mb-4">Create a new program</h1>
+        {message && (
+          <div
+            className={`mb-4 p-2 ${
+              message.type === "success"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto">
           <ProgramFormField
             type="text"
@@ -45,9 +104,12 @@ const CreateProgram: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            disabled={isLoading}
+            className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Create Program
+            {isLoading ? "Creating Program..." : "Create Program"}
           </button>
         </form>
       </main>
