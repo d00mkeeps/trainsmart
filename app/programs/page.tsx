@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import fetchUserProfiles, { fetchUserPrograms } from "@/app/supabasefunctions";
-import { UserProfile } from "@/types";
+import { UserProfile } from "../profile/profile-types";
 import { Program } from "./program-types";
 import Link from "next/link";
 

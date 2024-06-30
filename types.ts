@@ -59,23 +59,6 @@ export const EditExerciseSchema = exerciseDataSchema.extend({
   exerciseId: z.number(),
 });
 
-// User profile type
-export type UserProfile = {
-  id: number;
-  user_id: number;
-  first_name: string;
-  last_name: string;
-  gender: string;
-  date_of_birth: string | null;
-  height: string | null;
-  weight: string | null;
-  is_imperial: boolean | null;
-  email: string | null;
-  created_at: string | null;
-  username: string | null;
-  password: string | null;
-};
-
 // Type for creating a new exercise
 export type NewExercise = Omit<Exercise, "id" | "time_created">;
 

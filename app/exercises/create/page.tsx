@@ -12,6 +12,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import fetchUserProfiles, { insertExercise } from "../../supabasefunctions";
 import { createClient } from "@supabase/supabase-js";
+import Header from "@/app/components/Header";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -119,56 +120,64 @@ function Form() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="grid col-auto">
-        <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
+    <div>
+      <Header />
 
-        <FormField
-          type="text"
-          placeholder="exercise name"
-          name="exerciseName"
-          register={register}
-          error={errors.exerciseName}
-          required={true}
-        />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid col-auto">
+          <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
 
-        <FormField
-          type="textarea"
-          placeholder="description (optional)"
-          name="exerciseDescription"
-          register={register}
-          error={errors.exerciseDescription}
-        />
+          <FormField
+            type="text"
+            placeholder="exercise name"
+            name="exerciseName"
+            register={register}
+            error={errors.exerciseName}
+            required={true}
+          />
 
-        <FormField
-          type="boolean"
-          label="Is this a time based exercise?"
-          name="isTimeBased"
-          register={register}
-          error={errors.isTimeBased}
-          valueAsNumber
-        />
+          <FormField
+            type="textarea"
+            placeholder="description (optional)"
+            name="exerciseDescription"
+            register={register}
+            error={errors.exerciseDescription}
+          />
 
-        <ReactSelectField<CreateExerciseFormData>
-          name="primaryMuscleGroupId"
-          label="Primary Muscle Group"
-          options={muscleGroupOptions}
-          control={control}
-          isClearable
-        />
-        <ReactSelectField<CreateExerciseFormData>
-          name="secondaryMuscleGroupId"
-          label="Secondary Muscle Group"
-          options={muscleGroupOptions}
-          control={control}
-          isClearable
-        />
+          <FormField
+            type="boolean"
+            label="Is this a time based exercise?"
+            name="isTimeBased"
+            register={register}
+            error={errors.isTimeBased}
+            valueAsNumber
+          />
 
-        <button type="submit" className="submit-button" disabled={isSubmitted}>
-          {isSubmitted ? "Exercise created!" : "Create"}
-        </button>
-      </div>
-    </form>
+          <ReactSelectField<CreateExerciseFormData>
+            name="primaryMuscleGroupId"
+            label="Primary Muscle Group"
+            options={muscleGroupOptions}
+            control={control}
+            isClearable
+          />
+          <ReactSelectField<CreateExerciseFormData>
+            name="secondaryMuscleGroupId"
+            label="Secondary Muscle Group"
+            options={muscleGroupOptions}
+            control={control}
+            isClearable
+          />
+
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isSubmitted}
+          >
+            {isSubmitted ? "Exercise created!" : "Create"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 

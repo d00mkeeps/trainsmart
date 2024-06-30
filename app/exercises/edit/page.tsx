@@ -1,4 +1,5 @@
 "use client";
+import Header from "../../components/Header";
 import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -159,59 +160,67 @@ function Form() {
   }));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="grid col-auto">
-        <h1 className="text-3xl font-bold mb-4">Edit Exercises</h1>
-        <ReactSelectField<CreateExerciseFormData>
-          name="selectedExerciseId"
-          label="Choose an exercise"
-          options={exerciseOptions}
-          control={control}
-          isClearable
-          onExerciseSelect={handleExerciseSelect}
-        />
-        <FormField
-          type="text"
-          placeholder="exercise name"
-          name="exerciseName"
-          register={register}
-          error={errors.exerciseName}
-          required={true}
-        />
-        <FormField
-          type="textarea"
-          placeholder="description (optional)"
-          name="exerciseDescription"
-          register={register}
-          error={errors.exerciseDescription}
-        />
-        <FormField
-          type="boolean"
-          label="Is this a time based exercise?"
-          name="isTimeBased"
-          register={register}
-          error={errors.isTimeBased}
-          valueAsNumber
-        />
-        <ReactSelectField<CreateExerciseFormData>
-          name="primaryMuscleGroupId"
-          label="Primary Muscle Group"
-          options={muscleGroupOptions}
-          control={control}
-          isClearable
-        />
-        <ReactSelectField<CreateExerciseFormData>
-          name="secondaryMuscleGroupId"
-          label="Secondary Muscle Group"
-          options={muscleGroupOptions}
-          control={control}
-          isClearable
-        />
-        <button type="submit" className="submit-button" disabled={isSubmitted}>
-          {isSubmitted ? "Exercise edited!" : "Update"}
-        </button>
-      </div>
-    </form>
+    <div>
+      {" "}
+      <Header />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid col-auto">
+          <h1 className="text-3xl font-bold mb-4">Edit Exercises</h1>
+          <ReactSelectField<CreateExerciseFormData>
+            name="selectedExerciseId"
+            label="Choose an exercise"
+            options={exerciseOptions}
+            control={control}
+            isClearable
+            onExerciseSelect={handleExerciseSelect}
+          />
+          <FormField
+            type="text"
+            placeholder="exercise name"
+            name="exerciseName"
+            register={register}
+            error={errors.exerciseName}
+            required={true}
+          />
+          <FormField
+            type="textarea"
+            placeholder="description (optional)"
+            name="exerciseDescription"
+            register={register}
+            error={errors.exerciseDescription}
+          />
+          <FormField
+            type="boolean"
+            label="Is this a time based exercise?"
+            name="isTimeBased"
+            register={register}
+            error={errors.isTimeBased}
+            valueAsNumber
+          />
+          <ReactSelectField<CreateExerciseFormData>
+            name="primaryMuscleGroupId"
+            label="Primary Muscle Group"
+            options={muscleGroupOptions}
+            control={control}
+            isClearable
+          />
+          <ReactSelectField<CreateExerciseFormData>
+            name="secondaryMuscleGroupId"
+            label="Secondary Muscle Group"
+            options={muscleGroupOptions}
+            control={control}
+            isClearable
+          />
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isSubmitted}
+          >
+            {isSubmitted ? "Exercise edited!" : "Update"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
