@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Path,
@@ -6,13 +7,14 @@ import {
   Merge,
   FieldErrorsImpl,
 } from "react-hook-form";
-import { CreateProgramFormData } from "@/types"; // Adjust the import path as needed
+import { CreateProgramFormData } from "./program-types"; // Adjust the import path as needed
 import Select from "react-select";
 const getErrorMessage = (error: any): string => {
   if (typeof error === "string") return error;
   if (error?.message && typeof error.message === "string") return error.message;
   return "An error occurred";
 };
+
 type ProgramFormFieldProps = {
   type: "text" | "textarea" | "select";
   label: string;
