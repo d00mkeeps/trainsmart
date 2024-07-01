@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { CreateProgramFormData } from "../program-types";
-import ProgramFormField from "../ProgramFormField";
+import ProgramFormField from "../../components/ProgramFormField";
 import fetchUserProfiles, { insertProgram } from "@/app/supabasefunctions";
-import { UserProfile } from "@/types";
+import { UserProfile } from "../../profile/profile-types";
 
 const CreateProgram: React.FC = () => {
   const {
@@ -64,7 +64,7 @@ const CreateProgram: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
-      //TODO: return user to program display page//
+      //TODO: return user to program display page using useRouter//
     }
   };
 

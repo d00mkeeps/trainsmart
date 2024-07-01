@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import fetchUserProfiles from "../supabasefunctions";
 import { ProfileField, UserProfile } from "./profile-types";
+import Link from "next/link";
 
 const ProfilePage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -93,6 +94,13 @@ const ProfilePage = () => {
           </div>
         </div>
       </main>
+
+      <Link
+        href="/profile/edit"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Edit profile
+      </Link>
     </div>
   );
 };

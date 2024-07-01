@@ -3,9 +3,8 @@ import Header from "../../components/Header";
 import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import FormField from "../FormField";
+import FormField from "../../components/FormField";
 import {
-  UserProfile,
   CreateExerciseFormData,
   CreateExerciseSchema,
   RetrievedExercise,
@@ -17,6 +16,7 @@ import fetchUserProfiles, {
   updateExercise,
 } from "../../supabasefunctions";
 import { createClient } from "@supabase/supabase-js";
+import { UserProfile } from "@/app/profile/profile-types";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;

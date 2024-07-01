@@ -1,8 +1,8 @@
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { errorMonitor } from "stream";
-import { RetrievedExercise, UserProfile, NewExercise } from "@/types";
+import { RetrievedExercise, NewExercise } from "@/types";
 import { CreateProgramFormData, Program } from "./programs/program-types";
-
+import { UserProfile } from "./profile/profile-types";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
@@ -146,5 +146,26 @@ export async function fetchUserPrograms(userId: number) {
   } catch (error) {
     console.error("error fetching user programs: ", error);
     return { success: false, error };
+  }
+}
+
+export async function updateUserProfile(profile: UserProfile) {
+  try {
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .update({
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        //add other fields here
+      })
+      .eq("user_id", profile.user_id);
+
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error updating user profile: ", error);
+
+    return { success: false, error: error };
   }
 }
