@@ -3,7 +3,7 @@ import Header from "../../components/Header";
 import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import FormField from "../../components/FormField";
+import FormField from "../../components/ExerciseFormField";
 import {
   CreateExerciseFormData,
   CreateExerciseSchema,

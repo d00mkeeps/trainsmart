@@ -156,7 +156,13 @@ export async function updateUserProfile(profile: UserProfile) {
       .update({
         first_name: profile.first_name,
         last_name: profile.last_name,
-        //add other fields here
+        username: profile.username,
+        email: profile.email,
+        gender: profile.gender,
+        date_of_birth: profile.date_of_birth,
+        height: profile.height,
+        weight: profile.weight,
+        is_imperial: profile.is_imperial,
       })
       .eq("user_id", profile.user_id);
 
