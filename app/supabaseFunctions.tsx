@@ -175,3 +175,19 @@ export async function updateUserProfile(profile: UserProfile) {
     return { success: false, error: error };
   }
 }
+export async function deleteProgram(selectedProgramId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("programs")
+      .delete()
+      .eq("id", selectedProgramId);
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error deleting program: ", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error : new Error(String(error)),
+    };
+  }
+}

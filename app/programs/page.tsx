@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import fetchUserProfiles, { fetchUserPrograms } from "@/app/supabasefunctions";
+import fetchUserProfiles, {
+  fetchUserPrograms,
+  deleteProgram,
+} from "@/app/supabasefunctions";
 import { UserProfile } from "../profile/profile-types";
 import { Program } from "./program-types";
 import Link from "next/link";
@@ -14,6 +17,31 @@ const ProgramPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const handleDelete = async (selectedProgramId: number) => {
+    setTimeout(async () => {
+      if (window.confirm("Are you sure you want to delete this program?")) {
+        try {
+          const result = await deleteProgram(selectedProgramId);
+          if (result.success) {
+            setUserPrograms((prevPrograms) =>
+              prevPrograms.filter((program) => program.id !== selectedProgramId)
+            );
+          } else {
+            // Safely handle the error
+            const errorMessage =
+              result.error instanceof Error
+                ? result.error.message
+                : String(result.error);
+            throw new Error(errorMessage);
+          }
+        } catch (error) {
+          console.error("Failed to delete program :(  ", error);
+          //TODO: add logic to display message to user here
+          setError("Failed to delete program, please try again.");
+        }
+      }
+    }, 100);
+  };
   useEffect(() => {
     const loadUserPrograms = async () => {
       setIsLoading(true);
@@ -75,6 +103,13 @@ const ProgramPage = () => {
                   icon={<PencilIcon className="w-4 h-4" />}
                   variant="primary"
                   className="mt-2"
+                />
+                <ActionButton
+                  href="#"
+                  label="delete"
+                  variant="danger"
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={() => handleDelete(program.id)}
                 />
               </div>
             ))}
