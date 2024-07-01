@@ -6,6 +6,8 @@ import fetchUserProfiles, { fetchUserPrograms } from "@/app/supabasefunctions";
 import { UserProfile } from "../profile/profile-types";
 import { Program } from "./program-types";
 import Link from "next/link";
+import ActionButton from "../components/ActionButton";
+import { PencilIcon } from "@heroicons/react/24/solid";
 
 const ProgramPage = () => {
   const [userPrograms, setUserPrograms] = useState<Program[]>([]);
@@ -67,6 +69,13 @@ const ProgramPage = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   Created: {new Date(program.time).toLocaleDateString()}
                 </p>
+                <ActionButton
+                  href={`/programs/edit/${program.id}`}
+                  label="Edit"
+                  icon={<PencilIcon className="w-4 h-4" />}
+                  variant="primary"
+                  className="mt-2"
+                />
               </div>
             ))}
           </div>
