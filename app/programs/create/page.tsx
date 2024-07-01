@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -33,7 +33,7 @@ const CreateProgram: React.FC = () => {
     }
     loadUserProfile();
   }, []);
-
+  const router = useRouter();
   const onSubmit: SubmitHandler<CreateProgramFormData> = async (data) => {
     if (!userProfile) {
       setMessage({ type: "error", text: "User profile not found" });
@@ -48,7 +48,9 @@ const CreateProgram: React.FC = () => {
       if (result.success) {
         console.log("Program created successfully:", result.data);
         setMessage({ type: "success", text: "Program created successfully!" });
-        // You could redirect the user or clear the form here
+        setTimeout(() => {
+          router.push("/programs");
+        }, 100);
       } else {
         console.error("Error creating program:", result.error);
         setMessage({
