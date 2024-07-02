@@ -38,6 +38,12 @@ const MuscleGroupSelectField = <TFieldValues extends FieldValues>({
             placeholder={placeholder}
             isClearable={isClearable}
             isSearchable={true}
+            onChange={(selectedOption) => {
+              field.onChange(selectedOption ? selectedOption.value : null);
+            }}
+            value={
+              options.find((option) => option.value === field.value) || null
+            }
           />
         )}
       />

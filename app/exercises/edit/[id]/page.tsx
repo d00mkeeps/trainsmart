@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClient } from "@supabase/supabase-js";
 import Header from "../../../components/Header";
 import FormField from "../../../components/ExerciseFormField";
 import ReactSelectField from "../../../components/ReactSelectField";
@@ -15,7 +14,8 @@ import {
 } from "@/types";
 import { fetchUserExercises, updateExercise } from "../../../supabasefunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { convertToOptions } from "../../create-from-template/[id]/page";
+import { convertToMuscleGroupOptions } from "../../create-from-template/[id]/page";
+import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
 
@@ -114,7 +114,7 @@ export default function EditExercisePage({
     }
   };
 
-  const muscleGroupOptions = convertToOptions(muscleGroups);
+  const muscleGroupOptions = convertToMuscleGroupOptions(muscleGroups);
 
   if (!exercise) {
     return <div>Loading...</div>;
@@ -149,7 +149,7 @@ export default function EditExercisePage({
             error={errors.isTimeBased}
             valueAsNumber
           />
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="primaryMuscleGroupId"
             placeholder="Choose..."
             label="Primary Muscle Group"
@@ -157,7 +157,7 @@ export default function EditExercisePage({
             control={control}
             isClearable
           />
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="secondaryMuscleGroupId"
             label="Secondary Muscle Group"
             options={muscleGroupOptions}

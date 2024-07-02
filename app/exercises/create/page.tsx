@@ -14,7 +14,8 @@ import fetchUserProfiles, { insertExercise } from "../../supabasefunctions";
 import Header from "@/app/components/Header";
 import { UserProfile } from "@/app/profile/profile-types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { convertToOptions } from "../create-from-template/[id]/page";
+import { convertToMuscleGroupOptions } from "../create-from-template/[id]/page";
+import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
 const muscleGroups = [
@@ -40,7 +41,7 @@ const muscleGroups = [
 
 function Form() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const muscleGroupOptions = convertToOptions(muscleGroups);
+  const muscleGroupOptions = convertToMuscleGroupOptions(muscleGroups);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const router = useRouter();
   const {
@@ -81,13 +82,10 @@ function Form() {
     try {
       const newData = {
         name: data.exerciseName,
-        description: data.exerciseDescription,
+        description: data.exerciseDescription || null,
         is_time_based: data.isTimeBased,
         primary_muscle_group_id: data.primaryMuscleGroupId,
-        secondary_muscle_group_id:
-          data.secondaryMuscleGroupId === 222
-            ? null
-            : data.secondaryMuscleGroupId,
+        secondary_muscle_group_id: data.secondaryMuscleGroupId || null,
         user_id: userProfile.user_id,
         is_template: false,
       } as NewExercise;
@@ -152,7 +150,7 @@ function Form() {
             valueAsNumber
           />
 
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="primaryMuscleGroupId"
             label="Primary Muscle Group"
             options={muscleGroupOptions}
@@ -160,7 +158,7 @@ function Form() {
             isClearable
             placeholder="Choose..."
           />
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="secondaryMuscleGroupId"
             label="Secondary Muscle Group"
             options={muscleGroupOptions}

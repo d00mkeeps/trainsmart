@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "@/app/components/Header";
-import ReactSelectField, { Option } from "@/app/components/ReactSelectField";
 import FormField from "@/app/components/ExerciseFormField";
 import {
   CreateExerciseFormData,
@@ -19,6 +18,7 @@ import fetchUserProfiles, {
 } from "@/app/supabasefunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { UserProfile } from "@/app/profile/profile-types";
+import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
 
@@ -42,13 +42,10 @@ const muscleGroups = [
   { key: 10, value: "Traps" },
   { key: 16, value: "Triceps" },
 ];
-export const convertToOptions = (groups: typeof muscleGroups): Option[] => {
+export const convertToMuscleGroupOptions = (groups: typeof muscleGroups) => {
   return groups.map((group) => ({
     value: group.key,
     label: group.value,
-    name: group.value,
-    description: null,
-    isTemplate: false,
   }));
 };
 export default function CreateFromTemplatePage() {
@@ -58,7 +55,7 @@ export default function CreateFromTemplatePage() {
   const [template, setTemplate] = useState<RetrievedExercise | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  const muscleGroupOptions = convertToOptions(muscleGroups);
+  const muscleGroupOptions = convertToMuscleGroupOptions(muscleGroups);
   const router = useRouter();
   const {
     register,
@@ -191,7 +188,7 @@ export default function CreateFromTemplatePage() {
             error={errors.isTimeBased}
             valueAsNumber
           />
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="primaryMuscleGroupId"
             label="Primary Muscle Group"
             placeholder="Choose..."
@@ -199,7 +196,7 @@ export default function CreateFromTemplatePage() {
             control={control}
             isClearable
           />
-          <ReactSelectField<CreateExerciseFormData>
+          <MuscleGroupSelectField<CreateExerciseFormData>
             name="secondaryMuscleGroupId"
             label="Secondary Muscle Group"
             placeholder="Choose..."

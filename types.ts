@@ -50,7 +50,7 @@ const exerciseDataSchema = z.object({
   primaryMuscleGroupId: z.number().refine((val) => val !== 222, {
     message: "Please choose a primary muscle group",
   }),
-  secondaryMuscleGroupId: z.number().optional(),
+  secondaryMuscleGroupId: z.number().nullable().optional(),
 });
 
 export const CreateExerciseSchema = exerciseDataSchema;
