@@ -14,10 +14,7 @@ const Header = () => (
       <nav>
         <ul className="flex slace-x-4">
           <li>
-            <NavButton href="/exercises/create">Create Exercise</NavButton>
-          </li>
-          <li>
-            <NavButton href="/exercises/edit">Edit Exercise</NavButton>
+            <NavButton href="/exercises">Exercises</NavButton>
           </li>
           <li>
             <NavButton href="/programs">Programs</NavButton>

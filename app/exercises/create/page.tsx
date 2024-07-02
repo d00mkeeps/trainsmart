@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import ReactSelectField from "../../components/ReactSelectField";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -43,6 +44,7 @@ function Form() {
     label: group.value,
   }));
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -97,8 +99,9 @@ function Form() {
       if (result.success) {
         console.log("Exercise inserted successfully:", result);
         setIsSubmitted(true);
-        //reset form here
-        reset();
+        setTimeout(() => {
+          router.push("/exercises");
+        }, 100);
       } else {
         console.log("Failed to insert exercise:", result.error);
 
