@@ -6,7 +6,7 @@ import { UserProfile } from "./profile/profile-types";
 export const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 export const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-const supabase = createClientComponentClient();
+export const supabase = createClientComponentClient();
 export default fetchUserProfiles;
 
 async function fetchUserProfiles(): Promise<UserProfile | null> {

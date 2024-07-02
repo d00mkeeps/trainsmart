@@ -1,45 +1,66 @@
+// ExerciseSelectField.tsx
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import ReactSelectField from "./ReactSelectField";
-import { ExerciseSelectFieldProps } from "../exercises/exercise-types";
+import {
+  useForm,
+  Control,
+  FieldValues,
+  Path,
+  Controller,
+} from "react-hook-form";
+import Select, { components, OptionProps } from "react-select";
+import ActionButton from "./ActionButton";
 import { RetrievedExercise } from "@/types";
-import fetchUserProfiles, { fetchUserExercises } from "../supabasefunctions";
+import fetchUserProfiles, {
+  supabase,
+  fetchUserExercises,
+} from "../supabasefunctions";
 
-const ExerciseSelectField: React.FC<ExerciseSelectFieldProps> = ({
+interface ExerciseOption {
+  value: number;
+  label: string;
+  isTemplate: boolean;
+  description?: string | null;
+}
+
+interface ExerciseSelectFieldProps<TFieldValues extends FieldValues> {
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues>;
+  label: string;
+  placeholder: string;
+  onExerciseSelect?: (value: number | null) => void;
+}
+
+const ExerciseSelectField = <TFieldValues extends FieldValues>({
+  name,
+  control,
+  label,
+  placeholder,
   onExerciseSelect,
-}) => {
-  const [exercises, setExercises] = useState<RetrievedExercise[]>([]);
+}: ExerciseSelectFieldProps<TFieldValues>) => {
+  const [exercises, setExercises] = useState<ExerciseOption[]>([]);
   const router = useRouter();
-  const { control, setValue } = useForm();
 
-  const supabase = createClientComponentClient();
+  const loadExercises = async () => {
+    const userProfile = await fetchUserProfiles();
+    if (userProfile) {
+      const userExercises = await fetchUserExercises(userProfile.user_id);
+      if (userExercises) {
+        setExercises(
+          userExercises.map((ex) => ({
+            value: ex.id,
+            label: ex.name,
+            isTemplate: ex.is_template,
+            description: ex.description,
+          }))
+        );
+      }
+    }
+  };
 
   useEffect(() => {
-    const loadExercises = async () => {
-      const userProfile = await fetchUserProfiles();
-      if (userProfile) {
-        const userExercises = await fetchUserExercises(userProfile.user_id);
-        if (userExercises) {
-          setExercises(userExercises);
-        }
-      }
-    };
-
     loadExercises();
   }, []);
-  const handleModify = (exerciseId: number) => {
-    router.push(`/exercises/create-from-template/${exerciseId}`);
-  };
-  const handleExerciseSelect = (exerciseId: number | null) => {
-    // Handle exercise selection if needed
-    console.log("Selected exercise:", exerciseId);
-  };
-
-  const handleEdit = (exerciseId: number) => {
-    router.push(`/exercises/edit/${exerciseId}`);
-  };
 
   const handleDelete = async (exerciseId: number) => {
     const { error } = await supabase
@@ -48,30 +69,103 @@ const ExerciseSelectField: React.FC<ExerciseSelectFieldProps> = ({
       .eq("id", exerciseId);
 
     if (error) {
-      console.error("oh no! error deleting exercise: ", error);
+      console.error("Error deleting exercise:", error);
+      // Add user feedback for error
     } else {
-      setExercises(exercises.filter((ex) => ex.id !== exerciseId));
-      setValue("exercise", null); // Clear the select field
+      // Refresh the exercise list after successful deletion
+      loadExercises();
+      // Add user feedback for successful deletion
     }
+  };
+
+  const CustomOption: React.FC<OptionProps<ExerciseOption, false>> = (
+    props
+  ): React.ReactElement => {
+    const { label, description, isTemplate, value } = props.data;
+
+    const handleEdit = (exerciseId: number) => {
+      router.push(`/exercises/edit/${exerciseId}`);
+    };
+
+    const handleModify = (exerciseId: number) => {
+      router.push(`/exercises/create-from-template/${exerciseId}`);
+    };
+
+    return (
+      <components.Option {...props}>
+        <div className="flex items-center justify-between">
+          <span>
+            {label}
+            {isTemplate ? (
+              <span className="ml-2">(template)</span>
+            ) : (
+              <span className="ml-2">
+                | {description ? description : <i>No Description</i>}
+              </span>
+            )}
+          </span>
+          <div>
+            {isTemplate ? (
+              <ActionButton
+                href="#"
+                label="Modify"
+                variant="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModify(value);
+                }}
+              />
+            ) : (
+              <>
+                <ActionButton
+                  href="#"
+                  label="Edit"
+                  variant="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(value);
+                  }}
+                />
+                <ActionButton
+                  href="#"
+                  label="Delete"
+                  variant="danger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(value);
+                  }}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </components.Option>
+    );
   };
 
   return (
     <div>
-      <ReactSelectField
-        name="exercise"
+      <label htmlFor={name}>{label}</label>
+      <Controller
+        name={name}
         control={control}
-        options={exercises.map((ex) => ({
-          value: ex.id,
-          name: ex.name,
-          description: ex.description,
-          isTemplate: ex.is_template,
-        }))}
-        label="Select exercise"
-        placeholder="Choose..."
-        onExerciseSelect={handleExerciseSelect}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onModify={handleModify}
+        render={({ field }) => (
+          <Select<ExerciseOption, false>
+            {...field}
+            options={exercises}
+            placeholder={placeholder}
+            onChange={(selectedOption) => {
+              field.onChange(selectedOption ? selectedOption.value : null);
+              if (onExerciseSelect) {
+                onExerciseSelect(selectedOption ? selectedOption.value : null);
+              }
+            }}
+            components={{
+              Option: CustomOption,
+            }}
+            isSearchable={true}
+          />
+        )}
       />
     </div>
   );

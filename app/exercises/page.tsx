@@ -1,11 +1,20 @@
 "use client";
 import Link from "next/link";
 import React from "react";
+import { useForm, FieldValues } from "react-hook-form";
 import ExerciseSelectField from "../components/ExerciseSelectField";
 import Header from "../components/Header";
 
+// Define the form values type
+interface FormValues extends FieldValues {
+  exercise: number | null;
+}
+
 export default function TestExerciseSelectPage() {
-  const handleExerciseSelect = (exerciseId: number) => {
+  // Create the form control
+  const { control } = useForm<FormValues>();
+
+  const handleExerciseSelect = (exerciseId: number | null) => {
     console.log("Selected exercise ID:", exerciseId);
   };
 
@@ -19,7 +28,13 @@ export default function TestExerciseSelectPage() {
       >
         Create Exercise
       </Link>
-      <ExerciseSelectField onExerciseSelect={handleExerciseSelect} />
+      <ExerciseSelectField<FormValues>
+        name="exercise"
+        control={control}
+        label="Select Exercise"
+        placeholder="Choose an exercise"
+        onExerciseSelect={handleExerciseSelect}
+      />
       <div className="mt-4"></div>
     </div>
   );
