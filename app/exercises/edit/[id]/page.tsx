@@ -15,6 +15,7 @@ import {
 } from "@/types";
 import { fetchUserExercises, updateExercise } from "../../../supabasefunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { convertToOptions } from "../../create-from-template/[id]/page";
 
 const supabase = createClientComponentClient();
 
@@ -113,10 +114,7 @@ export default function EditExercisePage({
     }
   };
 
-  const muscleGroupOptions = muscleGroups.map((group) => ({
-    value: group.key,
-    label: group.value,
-  }));
+  const muscleGroupOptions = convertToOptions(muscleGroups);
 
   if (!exercise) {
     return <div>Loading...</div>;

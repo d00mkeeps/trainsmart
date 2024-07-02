@@ -29,7 +29,9 @@ const ExerciseSelectField: React.FC<ExerciseSelectFieldProps> = ({
 
     loadExercises();
   }, []);
-
+  const handleModify = (exerciseId: number) => {
+    router.push(`/exercises/create-from-template/${exerciseId}`);
+  };
   const handleExerciseSelect = (exerciseId: number | null) => {
     // Handle exercise selection if needed
     console.log("Selected exercise:", exerciseId);
@@ -58,12 +60,18 @@ const ExerciseSelectField: React.FC<ExerciseSelectFieldProps> = ({
       <ReactSelectField
         name="exercise"
         control={control}
-        options={exercises.map((ex) => ({ value: ex.id, label: ex.name }))}
+        options={exercises.map((ex) => ({
+          value: ex.id,
+          name: ex.name,
+          description: ex.description,
+          isTemplate: ex.is_template,
+        }))}
         label="Select exercise"
         placeholder="Choose..."
         onExerciseSelect={handleExerciseSelect}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onModify={handleModify}
       />
     </div>
   );

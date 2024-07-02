@@ -1,6 +1,5 @@
-import { SupabaseClient, createClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { errorMonitor } from "stream";
 import { RetrievedExercise, NewExercise } from "@/types";
 import { CreateProgramFormData, Program } from "./programs/program-types";
 import { UserProfile } from "./profile/profile-types";
@@ -57,7 +56,10 @@ export async function fetchUserExercises(
   userId: number,
   selectedExerciseId: number | null = null
 ): Promise<RetrievedExercise[] | null> {
-  let query = supabase.from("exercises").select("*").eq("user_id", userId);
+  let query = supabase
+    .from("exercises")
+    .select("*")
+    .or(`user_id.eq.${userId},is_template.eq.true`);
 
   if (selectedExerciseId) {
     query = query.eq("id", selectedExerciseId);

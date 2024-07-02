@@ -1,22 +1,27 @@
 "use client";
-import { useRouter } from "next/navigation";
-import ReactSelectField from "../../components/ReactSelectField";
+
+import { useParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import FormField from "../../components/ExerciseFormField";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Header from "@/app/components/Header";
+import ReactSelectField, { Option } from "@/app/components/ReactSelectField";
+import FormField from "@/app/components/ExerciseFormField";
 import {
-  NewExercise,
   CreateExerciseFormData,
   CreateExerciseSchema,
-} from "../../../types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import fetchUserProfiles, { insertExercise } from "../../supabasefunctions";
-import Header from "@/app/components/Header";
-import { UserProfile } from "@/app/profile/profile-types";
+  RetrievedExercise,
+  ExerciseData,
+} from "@/types";
+import fetchUserProfiles, {
+  fetchUserExercises,
+  insertExercise,
+} from "@/app/supabasefunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { convertToOptions } from "../create-from-template/[id]/page";
+import { UserProfile } from "@/app/profile/profile-types";
 
 const supabase = createClientComponentClient();
+
 const muscleGroups = [
   { key: 6, value: "Abdominals" },
   { key: 15, value: "Biceps" },
@@ -37,22 +42,34 @@ const muscleGroups = [
   { key: 10, value: "Traps" },
   { key: 16, value: "Triceps" },
 ];
-
-function Form() {
+export const convertToOptions = (groups: typeof muscleGroups): Option[] => {
+  return groups.map((group) => ({
+    value: group.key,
+    label: group.value,
+    name: group.value,
+    description: null,
+    isTemplate: false,
+  }));
+};
+export default function CreateFromTemplatePage() {
+  const params = useParams();
+  const id = params.id as string;
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const muscleGroupOptions = convertToOptions(muscleGroups);
+  const [template, setTemplate] = useState<RetrievedExercise | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const muscleGroupOptions = convertToOptions(muscleGroups);
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
-    reset,
     control,
+    setValue,
   } = useForm<CreateExerciseFormData>({
-    resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
+    resolver: zodResolver(CreateExerciseSchema),
   });
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isSubmitted) {
@@ -60,57 +77,80 @@ function Form() {
         setIsSubmitted(false);
       }, 1000);
     }
-  });
+    return () => clearTimeout(timer);
+  }, [isSubmitted]);
+
   useEffect(() => {
     async function loadUserProfile() {
       try {
-        const userProfile = await fetchUserProfiles();
-        setUserProfile(userProfile);
+        const profile = await fetchUserProfiles();
+        setUserProfile(profile);
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
     }
     loadUserProfile();
   }, []);
-  const onSubmit = async (data: CreateExerciseFormData) => {
+
+  useEffect(() => {
+    async function loadTemplate() {
+      if (id && userProfile) {
+        try {
+          const exercises = await fetchUserExercises(
+            userProfile.user_id,
+            Number(id)
+          );
+          if (exercises && exercises.length > 0) {
+            setTemplate(exercises[0]);
+            setValue("exerciseName", exercises[0].name);
+            setValue(
+              "exerciseDescription",
+              exercises[0].description || undefined
+            );
+            setValue("isTimeBased", exercises[0].is_time_based);
+            setValue(
+              "primaryMuscleGroupId",
+              exercises[0].primary_muscle_group_id
+            );
+            setValue(
+              "secondaryMuscleGroupId",
+              exercises[0].secondary_muscle_group_id || undefined
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching template:", error);
+        }
+      }
+    }
+    loadTemplate();
+  }, [id, userProfile, setValue]);
+
+  const onSubmit = async (data: ExerciseData) => {
     if (!userProfile) {
       console.error("user profile not loaded");
       return;
     }
 
     try {
-      const newData = {
+      const newExercise = {
         name: data.exerciseName,
-        description: data.exerciseDescription,
+        description: data.exerciseDescription ?? null,
         is_time_based: data.isTimeBased,
         primary_muscle_group_id: data.primaryMuscleGroupId,
-        secondary_muscle_group_id:
-          data.secondaryMuscleGroupId === 222
-            ? null
-            : data.secondaryMuscleGroupId,
+        secondary_muscle_group_id: data.secondaryMuscleGroupId ?? null,
         user_id: userProfile.user_id,
         is_template: false,
-      } as NewExercise;
-      console.log("new data:", newData);
+      };
 
-      const result = await insertExercise(supabase, newData);
+      const result = await insertExercise(supabase, newExercise);
       if (result.success) {
-        console.log("Exercise inserted successfully:", result);
+        console.log("Exercise created successfully:", result);
         setIsSubmitted(true);
         setTimeout(() => {
           router.push("/exercises");
-        }, 100);
+        }, 150);
       } else {
-        console.log("Failed to insert exercise:", result.error);
-
-        if (result.error?.code === "23505") {
-          setError("exerciseName", {
-            type: "manual",
-            message: "An exercise with this name already exists",
-          });
-        } else {
-          alert("Failed to insert exercise. Please try again.");
-        }
+        console.log("Failed to create exercise:", result.error);
       }
     } catch (error) {
       console.error("error submitting form:", error);
@@ -118,14 +158,16 @@ function Form() {
     }
   };
 
+  if (!template) return <div>Loading...</div>;
+
   return (
     <div>
       <Header />
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid col-auto">
-          <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
-
+          <h1 className="text-3xl font-bold mb-4">
+            Create Exercise from Template
+          </h1>
           <FormField
             type="text"
             placeholder="exercise name"
@@ -134,7 +176,6 @@ function Form() {
             error={errors.exerciseName}
             required={true}
           />
-
           <FormField
             type="textarea"
             placeholder="description (optional)"
@@ -142,7 +183,6 @@ function Form() {
             register={register}
             error={errors.exerciseDescription}
           />
-
           <FormField
             type="boolean"
             label="Is this a time based exercise?"
@@ -151,24 +191,22 @@ function Form() {
             error={errors.isTimeBased}
             valueAsNumber
           />
-
           <ReactSelectField<CreateExerciseFormData>
             name="primaryMuscleGroupId"
             label="Primary Muscle Group"
+            placeholder="Choose..."
             options={muscleGroupOptions}
             control={control}
             isClearable
-            placeholder="Choose..."
           />
           <ReactSelectField<CreateExerciseFormData>
             name="secondaryMuscleGroupId"
             label="Secondary Muscle Group"
+            placeholder="Choose..."
             options={muscleGroupOptions}
             control={control}
             isClearable
-            placeholder="Choose..."
           />
-
           <button
             type="submit"
             className="submit-button"
@@ -181,5 +219,3 @@ function Form() {
     </div>
   );
 }
-
-export default Form;

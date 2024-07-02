@@ -3,9 +3,11 @@ import Select, { components, OptionProps } from "react-select";
 import { Controller, Control, FieldValues, Path } from "react-hook-form";
 import ActionButton from "./ActionButton";
 
-interface Option {
+export interface Option {
   value: number;
-  label: string;
+  name: string;
+  isTemplate?: boolean;
+  description?: string | null;
 }
 
 interface ReactSelectProps<TFieldValues extends FieldValues> {
@@ -18,42 +20,70 @@ interface ReactSelectProps<TFieldValues extends FieldValues> {
   onExerciseSelect?: (value: number | null) => void;
   onEdit?: (value: number) => void;
   onDelete?: (value: number) => void;
+  onModify?: (value: number) => void;
 }
 interface CustomSelectProps {
   onEdit?: (value: number) => void;
   onDelete?: (value: number) => void;
+  onModify?: (value: number) => void;
 }
 
 const CustomOption: React.FC<OptionProps<Option, false> & CustomSelectProps> = (
   props
 ) => {
-  const { onEdit, onDelete } = props;
+  const { onEdit, onDelete, onModify } = props;
+  const { name, description, isTemplate, value } = props.data;
   return (
     <components.Option {...props}>
       <div className="flex items-center justify-between">
-        <span>{props.children}</span>
-        {onEdit && onDelete && (
-          <div>
+        <span>
+          {name}
+          {isTemplate ? (
+            <span className="ml-2">(template)</span>
+          ) : (
+            <span className="ml-2">
+              | {description ? description : <i>No Description</i>}
+            </span>
+          )}
+        </span>
+        <div>
+          {isTemplate && onModify ? (
             <ActionButton
               href="#"
-              label="Edit"
-              variant="primary"
+              label="Modify"
+              variant="secondary"
               onClick={(e) => {
                 e.stopPropagation();
-                onEdit(props.data.value);
+                onModify(value);
               }}
             />
-            <ActionButton
-              href="#"
-              label="Delete"
-              variant="danger"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(props.data.value);
-              }}
-            />
-          </div>
-        )}
+          ) : (
+            <>
+              {onEdit && (
+                <ActionButton
+                  href="#"
+                  label="Edit"
+                  variant="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(value);
+                  }}
+                />
+              )}
+              {onDelete && (
+                <ActionButton
+                  href="#"
+                  label="Delete"
+                  variant="danger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(props.data.value);
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
       </div>
     </components.Option>
   );
@@ -67,6 +97,7 @@ const ReactSelectField = <TFieldValues extends FieldValues>({
   onExerciseSelect,
   onEdit,
   onDelete,
+  onModify,
 }: ReactSelectProps<TFieldValues>) => {
   return (
     <div>
@@ -94,6 +125,7 @@ const ReactSelectField = <TFieldValues extends FieldValues>({
                   {...optionProps}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onModify={onModify}
                 />
               ),
             }}
