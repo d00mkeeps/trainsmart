@@ -66,7 +66,6 @@ const CreateProgram: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
-      //TODO: return user to program display page using useRouter//
     }
   };
 

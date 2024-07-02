@@ -1,71 +1,106 @@
 import React from "react";
-import Select, { StylesConfig, SingleValue } from "react-select";
+import Select, { components, OptionProps } from "react-select";
 import { Controller, Control, FieldValues, Path } from "react-hook-form";
+import ActionButton from "./ActionButton";
 
 interface Option {
-  value: number | string;
+  value: number;
   label: string;
 }
 
 interface ReactSelectProps<TFieldValues extends FieldValues> {
   name: Path<TFieldValues>;
-  options: { value: number | string; label: string }[];
   control: Control<TFieldValues>;
-  label?: string;
-  placeholder?: string;
+  options: Option[];
+  label: string;
+  placeholder: string;
   isClearable?: boolean;
-  onChange?: (selectedOption: Option | null) => number | string | null;
-  onExerciseSelect?: (exerciseId: number | string) => void
+  onExerciseSelect?: (value: number | null) => void;
+  onEdit?: (value: number) => void;
+  onDelete?: (value: number) => void;
+}
+interface CustomSelectProps {
+  onEdit?: (value: number) => void;
+  onDelete?: (value: number) => void;
 }
 
-function ReactSelectField<TFieldValues extends FieldValues>({
+const CustomOption: React.FC<OptionProps<Option, false> & CustomSelectProps> = (
+  props
+) => {
+  const { onEdit, onDelete } = props;
+  return (
+    <components.Option {...props}>
+      <div className="flex items-center justify-between">
+        <span>{props.children}</span>
+        {onEdit && onDelete && (
+          <div>
+            <ActionButton
+              href="#"
+              label="Edit"
+              variant="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(props.data.value);
+              }}
+            />
+            <ActionButton
+              href="#"
+              label="Delete"
+              variant="danger"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(props.data.value);
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </components.Option>
+  );
+};
+const ReactSelectField = <TFieldValues extends FieldValues>({
   name,
   control,
   options,
   label,
-  onChange,
-  placeholder = "Select...",
-  isClearable = false,
+  placeholder,
   onExerciseSelect,
-}: ReactSelectProps<TFieldValues>) {
-  const selectStyles: StylesConfig<Option, false> = {
-    control: (provided, state) => ({
-      ...provided,
-      borderColor: state.isFocused ? "blue" : provided.borderColor,
-    }),
-  };
-
+  onEdit,
+  onDelete,
+}: ReactSelectProps<TFieldValues>) => {
   return (
-    <div className="mb-4">
-      <label
-        className="block text-gray-700 text-sm font-bold mb-2"
-        htmlFor={name}
-      >
-        {label}
-      </label>
+    <div>
+      <label htmlFor={name}>{label}</label>
       <Controller
         name={name}
         control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
+        render={({ field }) => (
           <Select<Option, false>
+            {...field}
             options={options}
+            placeholder={placeholder}
             onChange={(selectedOption) => {
-              onChange(selectedOption?.value ?? null);
-              if (onExerciseSelect && selectedOption) {
-                onExerciseSelect(selectedOption.value)
+              field.onChange(selectedOption ? selectedOption.value : null);
+              if (onExerciseSelect) {
+                onExerciseSelect(selectedOption ? selectedOption.value : null);
               }
             }}
-            onBlur={onBlur}
-            value={options.find((option) => option.value === value)}
-            placeholder={placeholder}
-            isClearable={isClearable}
-            classNamePrefix="react-select"
-            styles={selectStyles}
+            value={
+              options.find((option) => option.value === field.value) || null
+            }
+            components={{
+              Option: (optionProps) => (
+                <CustomOption
+                  {...optionProps}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
+              ),
+            }}
           />
         )}
       />
     </div>
   );
-}
-
+};
 export default ReactSelectField;

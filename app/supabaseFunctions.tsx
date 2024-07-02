@@ -1,12 +1,13 @@
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { errorMonitor } from "stream";
 import { RetrievedExercise, NewExercise } from "@/types";
 import { CreateProgramFormData, Program } from "./programs/program-types";
 import { UserProfile } from "./profile/profile-types";
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+export const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+export const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-const supabase = createClient(url, key);
+const supabase = createClientComponentClient();
 export default fetchUserProfiles;
 
 async function fetchUserProfiles(): Promise<UserProfile | null> {

@@ -1,20 +1,23 @@
 "use client";
-import ReactSelectField from "../../components/ReactSelectField";
-import React, { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import FormField from "../../components/ExerciseFormField";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createClient } from "@supabase/supabase-js";
+import Header from "../../../components/Header";
+import FormField from "../../../components/ExerciseFormField";
+import ReactSelectField from "../../../components/ReactSelectField";
 import {
-  NewExercise,
   CreateExerciseFormData,
   CreateExerciseSchema,
-} from "../../../types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import fetchUserProfiles, { insertExercise } from "../../supabasefunctions";
-import Header from "@/app/components/Header";
-import { UserProfile } from "@/app/profile/profile-types";
+  RetrievedExercise,
+} from "@/types";
+import { fetchUserExercises, updateExercise } from "../../../supabasefunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const supabase = createClientComponentClient();
+
 const muscleGroups = [
   { key: 6, value: "Abdominals" },
   { key: 15, value: "Biceps" },
@@ -36,80 +39,73 @@ const muscleGroups = [
   { key: 16, value: "Triceps" },
 ];
 
-function Form() {
+export default function EditExercisePage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const router = useRouter();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const muscleGroupOptions = muscleGroups.map((group) => ({
-    value: group.key,
-    label: group.value,
-  }));
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [exercise, setExercise] = useState<RetrievedExercise | null>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
-    reset,
+    setValue,
     control,
   } = useForm<CreateExerciseFormData>({
-    resolver: zodResolver(CreateExerciseSchema), // Apply the zodResolver
+    resolver: zodResolver(CreateExerciseSchema),
   });
+
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isSubmitted) {
-      timer = setTimeout(() => {
-        setIsSubmitted(false);
-      }, 1000);
+    fetchExercise();
+  }, [params.id]);
+
+  const fetchExercise = async () => {
+    const exercises = await fetchUserExercises(1, parseInt(params.id));
+    if (exercises && exercises.length > 0) {
+      const fetchedExercise = exercises[0];
+      setExercise(fetchedExercise);
+      populateForm(fetchedExercise);
     }
-  });
-  useEffect(() => {
-    async function loadUserProfile() {
-      try {
-        const userProfile = await fetchUserProfiles();
-        setUserProfile(userProfile);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    }
-    loadUserProfile();
-  }, []);
+  };
+
+  const populateForm = (exercise: RetrievedExercise) => {
+    setValue("exerciseName", exercise.name);
+    setValue("exerciseDescription", exercise.description || undefined);
+    setValue("isTimeBased", exercise.is_time_based);
+    setValue("primaryMuscleGroupId", exercise.primary_muscle_group_id);
+    setValue(
+      "secondaryMuscleGroupId",
+      exercise.secondary_muscle_group_id || undefined
+    );
+  };
+
   const onSubmit = async (data: CreateExerciseFormData) => {
-    if (!userProfile) {
-      console.error("user profile not loaded");
-      return;
-    }
+    if (!exercise) return;
 
     try {
-      const newData = {
+      const updatedExercise = {
+        id: exercise.id,
         name: data.exerciseName,
-        description: data.exerciseDescription,
+        description: data.exerciseDescription ?? null,
         is_time_based: data.isTimeBased,
         primary_muscle_group_id: data.primaryMuscleGroupId,
-        secondary_muscle_group_id:
-          data.secondaryMuscleGroupId === 222
-            ? null
-            : data.secondaryMuscleGroupId,
-        user_id: userProfile.user_id,
-        is_template: false,
-      } as NewExercise;
-      console.log("new data:", newData);
+        secondary_muscle_group_id: data.secondaryMuscleGroupId ?? null,
+        user_id: exercise.user_id,
+        is_template: exercise.is_template,
+      };
 
-      const result = await insertExercise(supabase, newData);
+      const result = await updateExercise(supabase, updatedExercise);
       if (result.success) {
-        console.log("Exercise inserted successfully:", result);
+        console.log("Exercise updated successfully:", result);
         setIsSubmitted(true);
-        //reset form here
-        reset();
+        setTimeout(() => {
+          router.push("/exercises"); // Redirect to exercises list page
+        }, 200);
       } else {
-        console.log("Failed to insert exercise:", result.error);
-
-        if (result.error?.code === "23505") {
-          setError("exerciseName", {
-            type: "manual",
-            message: "An exercise with this name already exists",
-          });
-        } else {
-          alert("Failed to insert exercise. Please try again.");
-        }
+        console.log("Failed to update exercise:", result.error);
       }
     } catch (error) {
       console.error("error submitting form:", error);
@@ -117,14 +113,21 @@ function Form() {
     }
   };
 
+  const muscleGroupOptions = muscleGroups.map((group) => ({
+    value: group.key,
+    label: group.value,
+  }));
+
+  if (!exercise) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       <Header />
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid col-auto">
-          <h1 className="text-3xl font-bold mb-4">Create Exercise</h1>
-
+          <h1 className="text-3xl font-bold mb-4">Edit Exercise</h1>
           <FormField
             type="text"
             placeholder="exercise name"
@@ -133,7 +136,6 @@ function Form() {
             error={errors.exerciseName}
             required={true}
           />
-
           <FormField
             type="textarea"
             placeholder="description (optional)"
@@ -141,7 +143,6 @@ function Form() {
             register={register}
             error={errors.exerciseDescription}
           />
-
           <FormField
             type="boolean"
             label="Is this a time based exercise?"
@@ -150,35 +151,31 @@ function Form() {
             error={errors.isTimeBased}
             valueAsNumber
           />
-
           <ReactSelectField<CreateExerciseFormData>
             name="primaryMuscleGroupId"
+            placeholder="Choose..."
             label="Primary Muscle Group"
             options={muscleGroupOptions}
             control={control}
             isClearable
-            placeholder="Choose..."
           />
           <ReactSelectField<CreateExerciseFormData>
             name="secondaryMuscleGroupId"
             label="Secondary Muscle Group"
             options={muscleGroupOptions}
             control={control}
-            isClearable
             placeholder="Choose..."
+            isClearable
           />
-
           <button
             type="submit"
             className="submit-button"
             disabled={isSubmitted}
           >
-            {isSubmitted ? "Exercise created!" : "Create"}
+            {isSubmitted ? "Exercise updated!" : "Update"}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
-export default Form;

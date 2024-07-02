@@ -27,7 +27,6 @@ const ProgramPage = () => {
               prevPrograms.filter((program) => program.id !== selectedProgramId)
             );
           } else {
-            // Safely handle the error
             const errorMessage =
               result.error instanceof Error
                 ? result.error.message
