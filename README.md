@@ -1,5 +1,6 @@
 TODO:
-add program support
+
+add workout seelct field on program edit page
 
 do icons for edit and delete
 
