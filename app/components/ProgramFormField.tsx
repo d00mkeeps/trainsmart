@@ -15,11 +15,11 @@ const getErrorMessage = (error: any): string => {
   return "An error occurred";
 };
 
-type ProgramFormFieldProps = {
+type ProgramFormFieldProps<TFormData extends Record<string, any>> = {
   type: "text" | "textarea" | "select";
   label: string;
-  name: Path<CreateProgramFormData>;
-  register: UseFormRegister<CreateProgramFormData>;
+  name: Path<TFormData>;
+  register: UseFormRegister<TFormData>;
   error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
   required?: boolean;
   placeholder?: string;
@@ -27,7 +27,7 @@ type ProgramFormFieldProps = {
   onChange?: (value: any) => void;
 };
 
-export const ProgramFormField: React.FC<ProgramFormFieldProps> = ({
+export const ProgramFormField = <TFormData extends Record<string, any>>({
   type,
   label,
   name,
@@ -37,7 +37,7 @@ export const ProgramFormField: React.FC<ProgramFormFieldProps> = ({
   placeholder,
   options,
   onChange,
-}) => {
+}: ProgramFormFieldProps<TFormData>) => {
   const renderField = () => {
     switch (type) {
       case "text":
