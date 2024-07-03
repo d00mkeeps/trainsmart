@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import WorkoutSelectField from "@/app/components/WorkoutSelectField";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -10,7 +11,6 @@ import { useParams } from "next/navigation";
 import fetchUserProfiles, {
   updateProgram,
   fetchUserPrograms,
-  fetchUserProgramWorkouts,
 } from "@/app/supabaseFunctions";
 import { UserProfile } from "@/app/profile/profile-types";
 
@@ -21,6 +21,7 @@ interface EditProgramFormData {
 }
 
 const EditProgramPage = () => {
+  const [workoutsKey, setWorkoutsKey] = useState(0);
   const router = useRouter();
   const params = useParams();
   const currentProgramId = Number(params.id);
@@ -97,14 +98,34 @@ const EditProgramPage = () => {
       setIsLoading(false);
     }
   };
-
+  const handleWorkoutCreated = () => {
+    setWorkoutsKey((prevKey) => prevKey + 1);
+    setIsWorkoutModalOpen(false);
+  };
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
       <main className="container mx-auto mt-8 p-4">
-        <h1 className="text-2xl font-semibold mb-4 text-center">
-          Edit Program
-        </h1>
+        <div className="relative mb-8">
+          <Link
+            href="/programs"
+            className="absolute top-0 left-0 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+          >
+            ← Back
+          </Link>
+          <h1 className="text-2xl font-semibold text-center">Edit Program</h1>
+          <button
+            type="button"
+            onClick={handleSubmit(onSubmit)}
+            disabled={isLoading}
+            className={`absolute top-0 right-0 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isLoading ? "Updating..." : "Update Program"}
+          </button>
+        </div>
+
         {message && (
           <div
             className={`mb-4 p-2 text-center ${
@@ -116,7 +137,8 @@ const EditProgramPage = () => {
             {message.text}
           </div>
         )}
-        <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto">
+
+        <form className="max-w-md mx-auto space-y-4">
           <ProgramFormField
             type="text"
             label="Program Name"
@@ -134,9 +156,10 @@ const EditProgramPage = () => {
             error={errors.description}
             placeholder="Enter program description"
           />
-          <div className="flex items-center space-x-4 mb-4">
+          <div className="flex items-center space-x-4">
             <div className="flex-grow">
               <WorkoutSelectField
+                key={workoutsKey}
                 name="selectedWorkout"
                 control={control}
                 label="Select Workout"
@@ -155,24 +178,16 @@ const EditProgramPage = () => {
               Create Workout
             </button>
           </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ${
-              isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {isLoading ? "Updating Program..." : "Update Program"}
-          </button>
         </form>
+
         <WorkoutModal
           isOpen={isWorkoutModalOpen}
           onClose={() => setIsWorkoutModalOpen(false)}
+          onWorkoutCreated={handleWorkoutCreated}
           currentProgramId={currentProgramId}
         />
       </main>
     </div>
   );
 };
-
 export default EditProgramPage;

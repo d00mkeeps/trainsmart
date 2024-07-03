@@ -1,5 +1,4 @@
 import { FieldValues, Path, Control } from "react-hook-form";
-import { Exercise } from "./exercises/exercise-types";
 
 export interface Workout {
   name: string;
@@ -9,7 +8,8 @@ export interface Workout {
 export interface WorkoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (worokut: Workout) => void;
+  currentProgramId: number;
+  onWorkoutCreated: () => void;
 }
 
 export interface WorkoutOption {
@@ -25,4 +25,7 @@ export interface WorkoutSelectFieldProps<TFieldValues extends FieldValues> {
   placeholder: string;
   programId: number;
   onWorkoutSelect?: (workoutId: number | null) => void;
+}
+export interface WorkoutFormData {
+  workoutName: string;
 }

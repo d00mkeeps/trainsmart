@@ -9,6 +9,7 @@ import {
 import { WorkoutOption, WorkoutSelectFieldProps } from "../workout-types";
 import Select, { components, OptionProps } from "react-select";
 import fetchUserProfiles, {
+  deleteWorkout,
   supabase,
   fetchUserProgramWorkouts,
 } from "../supabaseFunctions";
@@ -47,18 +48,39 @@ const WorkoutSelectField = <TFieldValues extends FieldValues>({
     loadWorkouts();
   }, [programId]);
 
-  const CustomOption: React.FC<OptionProps<WorkoutOption, false>> = (
-    props
-  ): React.ReactElement => {
-    const { label, description } = props.data;
+  const handleDelete = async (workoutId: number) => {
+    try {
+      const result = await deleteWorkout(workoutId);
+      if (result.success) {
+        await loadWorkouts(); // Reload workouts after deletion
+      } else {
+        console.error("Failed to delete workout:", result.error);
+      }
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+    }
+  };
 
+  const CustomOption: React.FC<OptionProps<WorkoutOption, false>> = (props) => {
+    const { label, description, value } = props.data;
     return (
       <components.Option {...props}>
-        <div>
-          <span>{label}</span>
-          {description && (
-            <span className="ml-2 text-gray-500">{description}</span>
-          )}
+        <div className="flex items-center justify-between">
+          <div>
+            <span>{label}</span>
+            {description && (
+              <span className="ml-2 text-gray-500">{description}</span>
+            )}
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent select from opening/closing
+              handleDelete(value);
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
+          >
+            Delete
+          </button>
         </div>
       </components.Option>
     );

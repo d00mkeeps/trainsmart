@@ -1,26 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import fetchUserProfiles, { insertProgramWorkout } from '../supabaseFunctions';
-import { UserProfile } from '../profile/profile-types';
+import React, { useEffect, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import fetchUserProfiles, { insertProgramWorkout } from "../supabaseFunctions";
+import { UserProfile } from "../profile/profile-types";
+import { WorkoutModalProps, WorkoutFormData } from "../workout-types";
 
-interface WorkoutModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentProgramId: number
-}
-
-interface WorkoutFormData {
-  workoutName: string;
-}
-
-const WorkoutModal: React.FC<WorkoutModalProps> = ({ isOpen, onClose, currentProgramId }) => {
+const WorkoutModal: React.FC<WorkoutModalProps> = ({
+  isOpen,
+  onClose,
+  onWorkoutCreated,
+  currentProgramId,
+}) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<WorkoutFormData>();
 
   useEffect(() => {
@@ -30,7 +26,7 @@ const WorkoutModal: React.FC<WorkoutModalProps> = ({ isOpen, onClose, currentPro
         const profile = await fetchUserProfiles();
         setUserProfile(profile);
       } catch (error) {
-        console.error('Error fetching user profile: ', error);
+        console.error("Error fetching user profile: ", error);
       } finally {
         setIsLoading(false);
       }
@@ -40,11 +36,11 @@ const WorkoutModal: React.FC<WorkoutModalProps> = ({ isOpen, onClose, currentPro
 
   const onSubmit: SubmitHandler<WorkoutFormData> = async (data) => {
     if (isLoading) {
-      console.error('User profile is still loading');
+      console.error("User profile is still loading");
       return;
     }
     if (!userProfile?.user_id) {
-      console.error('User profile not loaded or user_id is missing');
+      console.error("User profile not loaded or user_id is missing");
       return;
     }
     try {
@@ -55,14 +51,16 @@ const WorkoutModal: React.FC<WorkoutModalProps> = ({ isOpen, onClose, currentPro
       });
 
       if (result.success) {
-        console.log('Workout created successfully:', result.data);
-        // Handle success (e.g., close modal, show success message)
+        console.log("Workout created successfully:", result.data);
+        onWorkoutCreated();
+        reset();
+        onClose();
       } else {
-        console.error('Failed to create workout:', result.error);
+        console.error("Failed to create workout:", result.error);
         // Handle error (e.g., show error message)
       }
     } catch (error) {
-      console.error('Error in workout creation:', error);
+      console.error("Error in workout creation:", error);
       // Handle unexpected errors
     }
 
@@ -79,18 +77,25 @@ const WorkoutModal: React.FC<WorkoutModalProps> = ({ isOpen, onClose, currentPro
         <h2 className="text-2xl font-semibold mb-4">Create New Workout</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label htmlFor="workoutName" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="workoutName"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Workout Name
             </label>
             <input
               id="workoutName"
               type="text"
-              {...register('workoutName', { required: 'Workout name is required' })}
+              {...register("workoutName", {
+                required: "Workout name is required",
+              })}
               className="w-full p-2 border rounded"
               placeholder="Enter workout name"
             />
             {errors.workoutName && (
-              <p className="mt-1 text-sm text-red-600">{errors.workoutName.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.workoutName.message}
+              </p>
             )}
           </div>
           <div className="flex justify-end">

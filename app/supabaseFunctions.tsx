@@ -300,3 +300,22 @@ export async function updateProgram(
     };
   }
 }
+export async function deleteWorkout(workoutId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("program_workouts")
+      .delete()
+      .eq("id", workoutId);
+
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error deleting workout:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
