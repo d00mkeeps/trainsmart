@@ -1,11 +1,27 @@
-import { UseFormRegister, FieldError, RegisterOptions } from "react-hook-form";
+import {
+  UseFormRegister,
+  FieldError,
+  RegisterOptions,
+  FieldValues,
+  Control,
+  Path,
+} from "react-hook-form";
 import { z } from "zod";
-
-export interface ExerciseSelectFieldProps {
-  onExerciseSelect?: (exerciseId: number) => void;
+export interface ExerciseOption {
+  value: number;
+  label: string;
+  isTemplate: boolean;
+  description?: string | null;
+}
+export interface ExerciseSelectFieldProps<TFieldValues extends FieldValues> {
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues>;
+  label: string;
+  placeholder: string;
+  onExerciseSelect?: (value: number | null) => void;
 }
 
- export type ExerciseData = {
+export type ExerciseData = {
   selectedExerciseId: number | null;
   exerciseName: string;
   exerciseDescription?: string;

@@ -10,26 +10,15 @@ import {
 } from "react-hook-form";
 import Select, { components, OptionProps } from "react-select";
 import ActionButton from "./ActionButton";
-import { RetrievedExercise } from "@/types";
 import fetchUserProfiles, {
   supabase,
   fetchUserExercises,
 } from "../supabaseFunctions";
-
-interface ExerciseOption {
-  value: number;
-  label: string;
-  isTemplate: boolean;
-  description?: string | null;
-}
-
-interface ExerciseSelectFieldProps<TFieldValues extends FieldValues> {
-  name: Path<TFieldValues>;
-  control: Control<TFieldValues>;
-  label: string;
-  placeholder: string;
-  onExerciseSelect?: (value: number | null) => void;
-}
+import {
+  ExerciseSelectFieldProps,
+  ExerciseOption,
+  RetrievedExercise,
+} from "../exercises/exercise-types";
 
 const ExerciseSelectField = <TFieldValues extends FieldValues>({
   name,
@@ -154,6 +143,9 @@ const ExerciseSelectField = <TFieldValues extends FieldValues>({
             {...field}
             options={exercises}
             placeholder={placeholder}
+            value={
+              exercises.find((option) => option.value === field.value) || null
+            }
             onChange={(selectedOption) => {
               field.onChange(selectedOption ? selectedOption.value : null);
               if (onExerciseSelect) {
