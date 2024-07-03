@@ -230,8 +230,7 @@ export async function fetchUserProgramWorkouts(
       .from("program_workouts")
       .select("*")
       .eq("user_id", userId)
-      .eq("program_id", programId)
-      .order("created_at", { ascending: true });
+      .eq("program_id", programId);
 
     if (error) throw error;
 

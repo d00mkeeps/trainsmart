@@ -10,4 +10,4 @@ implement user auth (long term)
 
 update to graphql (long term)
 
-add dark mode (long term)
+fix design

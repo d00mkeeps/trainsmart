@@ -1,4 +1,5 @@
 "use client";
+import WorkoutSelectField from "@/app/components/WorkoutSelectField";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
@@ -9,12 +10,14 @@ import { useParams } from "next/navigation";
 import fetchUserProfiles, {
   updateProgram,
   fetchUserPrograms,
+  fetchUserProgramWorkouts,
 } from "@/app/supabaseFunctions";
 import { UserProfile } from "@/app/profile/profile-types";
 
 interface EditProgramFormData {
   programName: string;
   description: string;
+  selectedWorkout: number | null;
 }
 
 const EditProgramPage = () => {
@@ -32,6 +35,7 @@ const EditProgramPage = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     setValue,
   } = useForm<EditProgramFormData>();
@@ -130,6 +134,27 @@ const EditProgramPage = () => {
             error={errors.description}
             placeholder="Enter program description"
           />
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="flex-grow">
+              <WorkoutSelectField
+                name="selectedWorkout"
+                control={control}
+                label="Select Workout"
+                placeholder="Choose a workout"
+                programId={currentProgramId}
+                onWorkoutSelect={(workoutId) =>
+                  console.log("Selected workout:", workoutId)
+                }
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsWorkoutModalOpen(true)}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Create Workout
+            </button>
+          </div>
           <button
             type="submit"
             disabled={isLoading}
@@ -140,14 +165,6 @@ const EditProgramPage = () => {
             {isLoading ? "Updating Program..." : "Update Program"}
           </button>
         </form>
-        <div className="text-center mt-8">
-          <button
-            onClick={() => setIsWorkoutModalOpen(true)}
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-          >
-            Create Workout
-          </button>
-        </div>
         <WorkoutModal
           isOpen={isWorkoutModalOpen}
           onClose={() => setIsWorkoutModalOpen(false)}
