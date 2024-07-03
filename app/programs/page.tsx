@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import fetchUserProfiles, {
   fetchUserPrograms,
   deleteProgram,
-} from "@/app/supabasefunctions";
+} from "@/app/supabaseFunctions";
 import { UserProfile } from "../profile/profile-types";
 import { Program } from "./program-types";
 import Link from "next/link";

@@ -194,31 +194,110 @@ export async function deleteProgram(selectedProgramId: number) {
     };
   }
 }
-export async function insertProgramWorkout(
-  workoutData: {
-    workout_name: string
-    program_id: number
-    user_id: number
-  }
-){
+export async function insertProgramWorkout(workoutData: {
+  workout_name: string;
+  program_id: number;
+  user_id: number;
+}) {
   try {
-    console.log('Inserting workout:', {workoutData});
-    const {data, error } = await supabase 
-    .from ('program_workouts')
-    .insert({
-      workout_name: workoutData.workout_name,
-      program_id: workoutData.program_id,
-      user_id: workoutData.user_id,
-    })
-    .select()
+    console.log("Inserting workout:", { workoutData });
+    const { data, error } = await supabase
+      .from("program_workouts")
+      .insert({
+        workout_name: workoutData.workout_name,
+        program_id: workoutData.program_id,
+        user_id: workoutData.user_id,
+      })
+      .select();
 
-    if (error) throw error
-    return { success: true, data}
-  }catch (error) {
-    console.error('error creating workout: ', error)
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error("error creating workout: ", error);
     return {
       success: false,
-      error: error instanceof Error ? error : new Error(String(error))
+      error: error instanceof Error ? error : new Error(String(error)),
+    };
+  }
+}
+
+export async function fetchUserProgramWorkouts(
+  userId: number,
+  programId: number
+) {
+  try {
+    const { data, error } = await supabase
+      .from("program_workouts")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("program_id", programId)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error fetching user programs: ", error);
+  }
+  return {
+    success: false,
+    error: error instanceof Error ? error : new Error(String(error)),
+  };
+}
+
+export async function updateProgram(
+  programId: number,
+  programData: {
+    name: string;
+    description: string;
+  }
+) {
+  console.log("Updating program:", { programId, programData });
+  try {
+    const { data, error } = await supabase
+      .from("programs")
+      .update({
+        name: programData.name,
+        description: programData.description,
+      })
+      .eq("id", programId)
+      .select(); // Add this to return the updated row
+
+    console.log("Supabase response:", { data, error });
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return { success: false, error: error.message };
     }
+
+    if (!data || data.length === 0) {
+      console.warn("No data returned from update operation");
+      // Check if the program exists
+      const { data: existingProgram, error: checkError } = await supabase
+        .from("programs")
+        .select()
+        .eq("id", programId)
+        .single();
+
+      if (checkError || !existingProgram) {
+        return { success: false, error: "Program not found" };
+      }
+
+      // If the program exists, the update didn't change anything
+      return {
+        success: true,
+        data: existingProgram,
+        message: "No changes were made",
+      };
+    }
+
+    return { success: true, data: data[0] };
+  } catch (error) {
+    console.error("Error updating program:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
   }
 }
