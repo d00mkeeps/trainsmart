@@ -14,7 +14,7 @@ import { RetrievedExercise } from "@/types";
 import fetchUserProfiles, {
   supabase,
   fetchUserExercises,
-} from "../supabasefunctions";
+} from "../supabaseFunctions";
 
 interface ExerciseOption {
   value: number;

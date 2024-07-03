@@ -28,6 +28,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "**/**/*.ts"
-  ],
+, "app/supabase/index.js"  ],
   "exclude": ["node_modules"]
 }

@@ -19,7 +19,7 @@ export type UserProfile = {
   user_id: number;
   first_name: string;
   last_name: string;
-  gender: string;
+  sex: string;
   date_of_birth: string | null;
   height: number | null;
   weight: number | null;

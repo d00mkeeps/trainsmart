@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { CreateProgramFormData } from "../program-types";
 import ProgramFormField from "../../components/ProgramFormField";
-import fetchUserProfiles, { insertProgram } from "@/app/supabasefunctions";
+import fetchUserProfiles, { insertProgram } from "@/app/supabaseFunctions";
 import { UserProfile } from "../../profile/profile-types";
 
 const CreateProgram: React.FC = () => {

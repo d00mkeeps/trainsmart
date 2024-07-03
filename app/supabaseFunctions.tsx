@@ -1,10 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { RetrievedExercise, NewExercise } from "@/types";
+import { RetrievedExercise, NewExercise } from "./exercises/exercise-types";
 import { CreateProgramFormData, Program } from "./programs/program-types";
 import { UserProfile } from "./profile/profile-types";
-export const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-export const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
 export const supabase = createClientComponentClient();
 export default fetchUserProfiles;
@@ -161,7 +159,7 @@ export async function updateUserProfile(profile: UserProfile) {
         last_name: profile.last_name,
         username: profile.username,
         email: profile.email,
-        gender: profile.gender,
+        sex: profile.sex,
         date_of_birth: profile.date_of_birth,
         height: profile.height,
         weight: profile.weight,

@@ -3,14 +3,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import Header from "@/app/components/Header";
-import fetchUserProfiles, { updateUserProfile } from "@/app/supabasefunctions";
+import fetchUserProfiles, { updateUserProfile } from "@/app/supabaseFunctions";
 import { UserProfile } from "../profile-types";
 import UserProfileFormField from "@/app/components/ProfileFormField";
 import ReactSelectField from "@/app/components/ReactSelectField";
 
-const sexOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
+ type SexOption = {
+  value: number,
+  label: string,
+  name: string
+  description: string
+}
+const sexOptions: SexOption[] = [
+  { value: 1, label: "Male", name:"Male", description: ' '},
+  { value: 2, label: "Female", name:"Female", description: ' '},
 ];
 
 const EditProfilePage = () => {
@@ -103,7 +109,7 @@ const EditProfilePage = () => {
             required
           />
           <ReactSelectField
-            name="gender"
+            name="sex"
             label="Sex"
             options={sexOptions}
             control={control}

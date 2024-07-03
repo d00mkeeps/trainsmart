@@ -1,44 +1,22 @@
 "use client";
-
+import { muscleGroups } from "@/app/constants/muscleGroups";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "../../../components/Header";
 import FormField from "../../../components/ExerciseFormField";
-import ReactSelectField from "../../../components/ReactSelectField";
 import {
   CreateExerciseFormData,
   CreateExerciseSchema,
   RetrievedExercise,
-} from "@/types";
-import { fetchUserExercises, updateExercise } from "../../../supabasefunctions";
+} from "../../exercise-types";
+import { fetchUserExercises, updateExercise } from "../../../supabaseFunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { convertToMuscleGroupOptions } from "../../create-from-template/[id]/page";
 import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
-
-const muscleGroups = [
-  { key: 6, value: "Abdominals" },
-  { key: 15, value: "Biceps" },
-  { key: 1, value: "Calves" },
-  { key: 18, value: "Cardiovascular system" },
-  { key: 11, value: "Chest" },
-  { key: 17, value: "Forearms" },
-  { key: 14, value: "Front delts" },
-  { key: 4, value: "Glutes" },
-  { key: 3, value: "Hamstrings" },
-  { key: 5, value: "Hip flexors" },
-  { key: 9, value: "Lats" },
-  { key: 13, value: "Lateral delts" },
-  { key: 8, value: "Lower back" },
-  { key: 7, value: "Obliques" },
-  { key: 2, value: "Quads" },
-  { key: 12, value: "Rear delts" },
-  { key: 10, value: "Traps" },
-  { key: 16, value: "Triceps" },
-];
 
 export default function EditExercisePage({
   params,

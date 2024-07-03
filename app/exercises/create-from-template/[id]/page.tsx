@@ -1,5 +1,6 @@
 "use client";
 
+import { muscleGroups } from "@/app/constants/muscleGroups";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -11,37 +12,17 @@ import {
   CreateExerciseSchema,
   RetrievedExercise,
   ExerciseData,
-} from "@/types";
+} from "../../exercise-types";
 import fetchUserProfiles, {
   fetchUserExercises,
   insertExercise,
-} from "@/app/supabasefunctions";
+} from "@/app/supabaseFunctions";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { UserProfile } from "@/app/profile/profile-types";
 import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
 
-const muscleGroups = [
-  { key: 6, value: "Abdominals" },
-  { key: 15, value: "Biceps" },
-  { key: 1, value: "Calves" },
-  { key: 18, value: "Cardiovascular system" },
-  { key: 11, value: "Chest" },
-  { key: 17, value: "Forearms" },
-  { key: 14, value: "Front delts" },
-  { key: 4, value: "Glutes" },
-  { key: 3, value: "Hamstrings" },
-  { key: 5, value: "Hip flexors" },
-  { key: 9, value: "Lats" },
-  { key: 13, value: "Lateral delts" },
-  { key: 8, value: "Lower back" },
-  { key: 7, value: "Obliques" },
-  { key: 2, value: "Quads" },
-  { key: 12, value: "Rear delts" },
-  { key: 10, value: "Traps" },
-  { key: 16, value: "Triceps" },
-];
 export const convertToMuscleGroupOptions = (groups: typeof muscleGroups) => {
   return groups.map((group) => ({
     value: group.key,
