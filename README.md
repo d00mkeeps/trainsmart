@@ -12,8 +12,9 @@ Rest In Peace v0.4
 
 # To test:
 
-0. go to a new directory and run 'git clone
+0. go to a new directory and run 'git clone https://github.com/d00mkeeps/trainsmart'
 1. look up 'supabase'
 2. make an account on the first legitimate looking website (it'll have a green logo)
-3. create a file named '.env.local'
-4.
+3. create a file named '.env.local' in the root directory (should be named 'trainsmart')
+4. put your secret keys in the .env.local and name them properly
+5. guess my DB schema and test the app!
