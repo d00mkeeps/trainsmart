@@ -1,11 +1,11 @@
-import { UserProfile } from "@/app/profile/profile-types";
+import { UserProfile } from "@/app/types/profile-types";
 import { supabase } from "./supabaseClient";
 
 export async function fetchUserProfiles(): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
       .from("user_profiles")
-      .select()
+      .select("*")
       .single();
     if (error) {
       throw error;
@@ -13,7 +13,20 @@ export async function fetchUserProfiles(): Promise<UserProfile | null> {
     if (!data) {
       throw new Error("User profile not found.");
     }
-    const userProfile = data;
+    const userProfile: UserProfile = {
+      user_id: data.user_id,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      sex: data.sex,
+      date_of_birth: data.date_of_birth,
+      height: data.height,
+      weight: data.weight,
+      is_imperial: data.is_imperial,
+      email: data.email,
+      created_at: data.created_at,
+      username: data.username,
+      password: data.password,
+    };
     console.log("Fetched user profiles:", userProfile);
     return userProfile;
   } catch (err) {

@@ -1,4 +1,4 @@
-import { CreateProgramFormData, Program } from "@/app/programs/program-types";
+import { CreateProgramFormData, Program } from "@/app/types/program-types";
 import { supabase } from "./supabaseClient";
 
 export async function insertProgram(

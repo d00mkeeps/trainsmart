@@ -1,6 +1,6 @@
 "use client";
 
-import { muscleGroups } from "@/constants/muscleGroups";
+import { muscleGroups } from "@/app/constants/muscleGroups";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -12,13 +12,14 @@ import {
   CreateExerciseSchema,
   RetrievedExercise,
   ExerciseData,
-} from "../../exercise-types";
-import fetchUserProfiles, {
+} from "../../../types/exercise-types";
+import {
+  fetchUserProfiles,
   fetchUserExercises,
   insertExercise,
-} from "@/app/supabaseFunctions";
+} from "@/app/supabase";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { UserProfile } from "@/app/profile/profile-types";
+import { UserProfile } from "@/app/types/profile-types";
 import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();

@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import fetchUserProfiles, {
+import {
+  fetchUserProfiles,
   fetchUserPrograms,
   deleteProgram,
-} from "@/app/supabaseFunctions";
-import { UserProfile } from "../profile/profile-types";
-import { Program } from "./program-types";
+} from "@/app/supabase";
+import { UserProfile } from "../types/profile-types";
+import { Program } from "../types/program-types";
 import Link from "next/link";
 import ActionButton from "../components/ActionButton";
 import { PencilIcon } from "@heroicons/react/24/solid";

@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { RetrievedExercise, NewExercise } from "@/app/exercises/exercise-types";
+import { RetrievedExercise, NewExercise } from "@/app/types/exercise-types";
 import { supabase } from "./supabaseClient";
 
 export const insertExercise = async (

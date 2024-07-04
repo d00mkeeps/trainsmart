@@ -8,11 +8,12 @@ import WorkoutModal from "../../../components/CreateWorkoutModal";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ProgramFormField } from "@/app/components/ProgramFormField";
 import { useParams } from "next/navigation";
-import fetchUserProfiles, {
+import {
+  fetchUserProfiles,
   updateProgram,
   fetchUserPrograms,
-} from "@/app/supabaseFunctions";
-import { UserProfile } from "@/app/profile/profile-types";
+} from "@/app/supabase";
+import { UserProfile } from "@/app/types/profile-types";
 
 interface EditProgramFormData {
   programName: string;

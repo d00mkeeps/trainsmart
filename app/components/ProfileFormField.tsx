@@ -1,7 +1,7 @@
 // components/UserProfileFormField.tsx
 import React from "react";
 import { UseFormRegister, FieldErrors, RegisterOptions } from "react-hook-form";
-import { UserProfile } from "../profile/profile-types";
+import { UserProfile } from "../types/profile-types";
 
 type FieldProps = {
   name: keyof UserProfile;

@@ -1,20 +1,19 @@
-TODO:
-(4/7/2024)
-I noticed performance issues in the program edit page, which reminded me that I still need to implement a context management system. After looking at the options, I decided that the best solution was to build custom hooks to handle user context and any other key data.
+RIP
 
-This strikes a nice balance between technical debt (current implementation) and overly complex systems (redux). Once I scale up to the beta, I'll build a more robust context management solution.
+I'm gonna say goodbye to this version. I learned a lot about building forms and basic pages, but it's rife with inefficient code and underlying flaws (no user auth).
 
-(future)
-Add dynamic rendering section in the edit program page. This will be used to edit the workouts in the program.
+I'm going to cut my losses and move on, as I feel that it would take more time to refactor everything to my current knowledge than to simply start fresh.
 
-add auth (google, apple id)
+The select components are pretty sweet tho, I'll keep them around in next version.
 
-do icons for edit and delete
+Rest In Peace v0.4
 
-fix units in user profile
+(btw, the api key in the commit history doesn't work anymore :P)
 
-implement user auth (long term)
+# To test:
 
-update to graphql (long term)
-
-fix design
+0. go to a new directory and run 'git clone
+1. look up 'supabase'
+2. make an account on the first legitimate looking website (it'll have a green logo)
+3. create a file named '.env.local'
+4.

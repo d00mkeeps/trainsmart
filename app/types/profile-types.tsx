@@ -1,3 +1,17 @@
+import { User } from "@supabase/supabase-js";
+import { ReactNode } from "react";
+
+export type UserProviderProps = {
+  children: ReactNode;
+};
+export type UserContextType = {
+  user: User | null;
+  profile: UserProfile | null;
+  isLoading: boolean;
+  refreshProfile: () => Promise<void>;
+  logout: () => Promise<void>;
+};
+
 export const ProfileField = ({
   label,
   value,
@@ -15,11 +29,10 @@ export const ProfileField = ({
 );
 //user profile type
 export type UserProfile = {
-  id: number;
   user_id: number;
   first_name: string;
   last_name: string;
-  sex: string;
+  sex: number;
   date_of_birth: string | null;
   height: number | null;
   weight: number | null;

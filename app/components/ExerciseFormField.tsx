@@ -1,4 +1,7 @@
-import { FormFieldProps, ExerciseData } from "@/types";
+import {
+  ExerciseFormFieldProps,
+  ExerciseData,
+} from "@/app/types/exercise-types";
 import React from "react";
 import { Path } from "react-hook-form";
 function FormField<T extends ExerciseData = ExerciseData>({
@@ -11,7 +14,7 @@ function FormField<T extends ExerciseData = ExerciseData>({
   label,
   required,
   children,
-}: FormFieldProps<T>): React.ReactElement {
+}: ExerciseFormFieldProps<T>): React.ReactElement {
   const renderField = () => {
     switch (type) {
       case "text":

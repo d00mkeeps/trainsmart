@@ -3,20 +3,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import Header from "@/app/components/Header";
-import fetchUserProfiles, { updateUserProfile } from "@/app/supabaseFunctions";
-import { UserProfile } from "../profile-types";
+import { fetchUserProfiles, updateUserProfile } from "@/app/supabase";
+import { UserProfile } from "../../types/profile-types";
 import UserProfileFormField from "@/app/components/ProfileFormField";
 import ReactSelectField from "@/app/components/ReactSelectField";
 
- type SexOption = {
-  value: number,
-  label: string,
-  name: string
-  description: string
-}
+type SexOption = {
+  value: number;
+  label: string;
+  name: string;
+  description: string;
+};
 const sexOptions: SexOption[] = [
-  { value: 1, label: "Male", name:"Male", description: ' '},
-  { value: 2, label: "Female", name:"Female", description: ' '},
+  { value: 1, label: "Male", name: "Male", description: " " },
+  { value: 2, label: "Female", name: "Female", description: " " },
 ];
 
 const EditProfilePage = () => {

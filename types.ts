@@ -1,1 +1,1 @@
-// use for global types/data structure
+// use for global types/data structures

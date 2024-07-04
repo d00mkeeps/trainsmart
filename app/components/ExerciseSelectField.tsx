@@ -10,15 +10,16 @@ import {
 } from "react-hook-form";
 import Select, { components, OptionProps } from "react-select";
 import ActionButton from "./ActionButton";
-import fetchUserProfiles, {
+import {
+  fetchUserProfiles,
   supabase,
   fetchUserExercises,
-} from "../lib/supabaseFunctions";
+} from "@/app/supabase";
 import {
   ExerciseSelectFieldProps,
   ExerciseOption,
   RetrievedExercise,
-} from "../exercises/exercise-types";
+} from "../types/exercise-types";
 
 const ExerciseSelectField = <TFieldValues extends FieldValues>({
   name,

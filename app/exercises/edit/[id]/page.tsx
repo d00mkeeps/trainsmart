@@ -1,5 +1,5 @@
 "use client";
-import { muscleGroups } from "@/constants/muscleGroups";
+import { muscleGroups } from "@/app/constants/muscleGroups";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -10,11 +10,8 @@ import {
   CreateExerciseFormData,
   CreateExerciseSchema,
   RetrievedExercise,
-} from "../../exercise-types";
-import {
-  fetchUserExercises,
-  updateExercise,
-} from "../../../lib/supabaseFunctions";
+} from "../../../types/exercise-types";
+import { fetchUserExercises, updateExercise } from "@/app/supabase";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { convertToMuscleGroupOptions } from "../../create-from-template/[id]/page";
 import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";

@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FieldValues, Controller } from "react-hook-form";
-import { WorkoutOption, WorkoutSelectFieldProps } from "../workout-types";
+import { WorkoutOption, WorkoutSelectFieldProps } from "../types/workout-types";
 import Select, { components, OptionProps } from "react-select";
-import fetchUserProfiles, {
+import {
+  fetchUserProfiles,
   deleteWorkout,
   fetchUserProgramWorkouts,
-} from "../lib/supabaseFunctions";
+} from "@/app/supabase";
 
 const WorkoutSelectField = <TFieldValues extends FieldValues>({
   name,
@@ -55,10 +56,11 @@ const WorkoutSelectField = <TFieldValues extends FieldValues>({
   };
 
   const CustomOption = React.memo(
-    ({ data, ...props }: OptionProps<WorkoutOption, false>) => {
+    (props: OptionProps<WorkoutOption, false>) => {
+      const { data, ...rest } = props;
       const { label, description, value } = data;
       return (
-        <components.Option {...props}>
+        <components.Option {...rest} data={data}>
           <div className="flex items-center justify-between">
             <div>
               <span>{label}</span>

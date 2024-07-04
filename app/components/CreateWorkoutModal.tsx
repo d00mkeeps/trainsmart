@@ -3,8 +3,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import fetchUserProfiles, {
   insertProgramWorkout,
 } from "../lib/supabaseFunctions";
-import { UserProfile } from "../profile/profile-types";
-import { WorkoutModalProps, WorkoutFormData } from "../workout-types";
+import { UserProfile } from "../types/profile-types";
+import { WorkoutModalProps, WorkoutFormData } from "../types/workout-types";
 
 const WorkoutModal: React.FC<WorkoutModalProps> = ({
   isOpen,

@@ -75,7 +75,7 @@ export type RetrievedExercise = Exercise;
 // Form data type for exercise forms
 export type ExerciseFormData = ExerciseData;
 
-export type FormFieldProps<T extends ExerciseData = ExerciseData> = {
+export type ExerciseFormFieldProps<T extends ExerciseData = ExerciseData> = {
   type: "text" | "number" | "boolean" | "select" | "textarea";
   placeholder?: string;
   name: keyof T;

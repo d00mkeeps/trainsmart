@@ -3,10 +3,10 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { CreateProgramFormData } from "../program-types";
+import { CreateProgramFormData } from "../../types/program-types";
 import ProgramFormField from "../../components/ProgramFormField";
-import fetchUserProfiles, { insertProgram } from "@/app/supabaseFunctions";
-import { UserProfile } from "../../profile/profile-types";
+import { insertProgram, fetchUserProfiles } from "@/app/supabase";
+import { UserProfile } from "../../types/profile-types";
 
 const CreateProgram: React.FC = () => {
   const {
