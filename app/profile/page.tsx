@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import fetchUserProfiles from "../supabaseFunctions";
+import fetchUserProfiles from "../lib/supabaseFunctions";
 import { ProfileField, UserProfile } from "./profile-types";
 import Link from "next/link";
 

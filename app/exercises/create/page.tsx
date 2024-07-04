@@ -1,5 +1,5 @@
 "use client";
-import {muscleGroups} from '@/app/constants/muscleGroups'
+import { muscleGroups } from "@/constants/muscleGroups";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,7 @@ import {
   CreateExerciseSchema,
 } from "../exercise-types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import fetchUserProfiles, { insertExercise } from "../../supabaseFunctions";
+import fetchUserProfiles, { insertExercise } from "../../lib/supabaseFunctions";
 import Header from "@/app/components/Header";
 import { UserProfile } from "@/app/profile/profile-types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -18,7 +18,6 @@ import { convertToMuscleGroupOptions } from "../create-from-template/[id]/page";
 import MuscleGroupSelectField from "@/app/components/MuscleGroupSelectField";
 
 const supabase = createClientComponentClient();
- 
 
 function Form() {
   const [isSubmitted, setIsSubmitted] = useState(false);

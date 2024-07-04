@@ -10,8 +10,8 @@ const Home = () => {
         <section className="text-center">
           <h2 className="text-2xl font-semibold mb-4">Welcome to TrainSmart</h2>
           <p className="mb-8">
-            Your personal fitness companion. Start your journey to a healthier
-            you today!
+            Current features: exercise management, program creation/editing,
+            user profile management
           </p>
         </section>
       </main>

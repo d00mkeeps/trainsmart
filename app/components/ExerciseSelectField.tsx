@@ -13,7 +13,7 @@ import ActionButton from "./ActionButton";
 import fetchUserProfiles, {
   supabase,
   fetchUserExercises,
-} from "../supabaseFunctions";
+} from "../lib/supabaseFunctions";
 import {
   ExerciseSelectFieldProps,
   ExerciseOption,

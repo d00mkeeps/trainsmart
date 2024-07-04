@@ -1,6 +1,6 @@
 "use client";
 
-import { muscleGroups } from "@/app/constants/muscleGroups";
+import { muscleGroups } from "@/constants/muscleGroups";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";

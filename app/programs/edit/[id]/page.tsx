@@ -20,7 +20,7 @@ interface EditProgramFormData {
   selectedWorkout: number | null;
 }
 
-const EditProgramPage = () => {
+const EditProgramPage = React.memo(() => {
   const [workoutsKey, setWorkoutsKey] = useState(0);
   const router = useRouter();
   const params = useParams();
@@ -64,7 +64,7 @@ const EditProgramPage = () => {
       }
     }
     loadUserProfileAndProgram();
-  }, [currentProgramId, setValue]);
+  }, [currentProgramId]);
 
   const onSubmit: SubmitHandler<EditProgramFormData> = async (data) => {
     setIsLoading(true);
@@ -162,8 +162,8 @@ const EditProgramPage = () => {
                 key={workoutsKey}
                 name="selectedWorkout"
                 control={control}
-                label="Select Workout"
-                placeholder="Choose a workout"
+                label="Select a Workout"
+                placeholder="Search"
                 programId={currentProgramId}
                 onWorkoutSelect={(workoutId) =>
                   console.log("Selected workout:", workoutId)
@@ -175,7 +175,7 @@ const EditProgramPage = () => {
               onClick={() => setIsWorkoutModalOpen(true)}
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
             >
-              Create Workout
+              Add new workout
             </button>
           </div>
         </form>
@@ -189,5 +189,5 @@ const EditProgramPage = () => {
       </main>
     </div>
   );
-};
+});
 export default EditProgramPage;

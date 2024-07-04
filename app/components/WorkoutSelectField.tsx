@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from "react";
-import {
-  useForm,
-  Control,
-  FieldValues,
-  Path,
-  Controller,
-} from "react-hook-form";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { FieldValues, Controller } from "react-hook-form";
 import { WorkoutOption, WorkoutSelectFieldProps } from "../workout-types";
 import Select, { components, OptionProps } from "react-select";
 import fetchUserProfiles, {
   deleteWorkout,
-  supabase,
   fetchUserProgramWorkouts,
-} from "../supabaseFunctions";
+} from "../lib/supabaseFunctions";
 
 const WorkoutSelectField = <TFieldValues extends FieldValues>({
   name,
@@ -23,8 +16,8 @@ const WorkoutSelectField = <TFieldValues extends FieldValues>({
   onWorkoutSelect,
 }: WorkoutSelectFieldProps<TFieldValues>) => {
   const [workouts, setWorkouts] = useState<WorkoutOption[]>([]);
-
-  const loadWorkouts = async () => {
+  const memoizedWorkouts = useMemo(() => workouts, [workouts]);
+  const loadWorkouts = useCallback(async () => {
     const userProfile = await fetchUserProfiles();
     if (userProfile) {
       const workoutsResult = await fetchUserProgramWorkouts(
@@ -42,7 +35,7 @@ const WorkoutSelectField = <TFieldValues extends FieldValues>({
         );
       }
     }
-  };
+  }, [programId]);
 
   useEffect(() => {
     loadWorkouts();
@@ -61,30 +54,32 @@ const WorkoutSelectField = <TFieldValues extends FieldValues>({
     }
   };
 
-  const CustomOption: React.FC<OptionProps<WorkoutOption, false>> = (props) => {
-    const { label, description, value } = props.data;
-    return (
-      <components.Option {...props}>
-        <div className="flex items-center justify-between">
-          <div>
-            <span>{label}</span>
-            {description && (
-              <span className="ml-2 text-gray-500">{description}</span>
-            )}
+  const CustomOption = React.memo(
+    ({ data, ...props }: OptionProps<WorkoutOption, false>) => {
+      const { label, description, value } = data;
+      return (
+        <components.Option {...props}>
+          <div className="flex items-center justify-between">
+            <div>
+              <span>{label}</span>
+              {description && (
+                <span className="ml-2 text-gray-500">{description}</span>
+              )}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent select from opening/closing
+                handleDelete(value);
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
+            >
+              Delete
+            </button>
           </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent select from opening/closing
-              handleDelete(value);
-            }}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-xs"
-          >
-            Delete
-          </button>
-        </div>
-      </components.Option>
-    );
-  };
+        </components.Option>
+      );
+    }
+  );
 
   return (
     <div>

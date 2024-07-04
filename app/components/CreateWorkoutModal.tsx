@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import fetchUserProfiles, { insertProgramWorkout } from "../supabaseFunctions";
+import fetchUserProfiles, {
+  insertProgramWorkout,
+} from "../lib/supabaseFunctions";
 import { UserProfile } from "../profile/profile-types";
 import { WorkoutModalProps, WorkoutFormData } from "../workout-types";
 
